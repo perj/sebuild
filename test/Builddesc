@@ -1,0 +1,17 @@
+# Copyright 2018 Schibsted
+
+COMPONENT([
+	go/src/gopath
+	collect_special
+	srcdir
+	c
+])
+
+FOO(test
+	foos::pbuild,cfoo,cbar,cbaz[foo.foo test.foo zlib.foo]
+	srcopts[foo.foo:bar]
+	specialsrcs[
+		persist_cc:/dev/null:test.foo
+		test_zlib_config:/dev/null:zlib.foo
+	]
+)

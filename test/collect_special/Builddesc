@@ -1,0 +1,6 @@
+# Copyright 2018 Schibsted
+
+INSTALL(collect_test
+	specialsrcs[echo_names:$_gocover:hejsan.txt]
+	conf[hejsan.txt]
+)

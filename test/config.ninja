@@ -1,0 +1,4 @@
+# Copyright 2018 Schibsted
+
+scmcoord_contrib=/opt/scmcoord_contrib
+gopath=go:$scmcoord_contrib/go

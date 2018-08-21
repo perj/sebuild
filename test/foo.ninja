@@ -1,0 +1,4 @@
+# Copyright 2018 Schibsted
+
+rule foo-cp
+    command = cp $in $out && echo $srcopts >> $out

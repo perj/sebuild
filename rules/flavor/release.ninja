@@ -1,0 +1,4 @@
+# Copyright 2018 Schibsted
+
+cflags=-g -pipe -O2 -D_GNU_SOURCE -fvisibility=hidden -fstack-protector
+cwarnflags=-Wall

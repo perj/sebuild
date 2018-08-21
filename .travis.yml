@@ -1,0 +1,15 @@
+language: go
+go:
+- "1.10.3"
+
+dist: trusty
+addons:
+  apt:
+    packages:
+    - ninja-build
+
+install:
+- gem install ronn
+
+script:
+- RUNTESTS=1 ./compile.sh

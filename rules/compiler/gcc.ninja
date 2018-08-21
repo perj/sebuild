@@ -1,0 +1,4 @@
+# Copyright 2018 Schibsted
+
+# clang does not support -Wlogical-op so only set it for gcc.
+warncompiler=-Wlogical-op

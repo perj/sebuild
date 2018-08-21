@@ -1,0 +1,5 @@
+# Copyright 2018 Schibsted
+
+PROG(build_ctest
+	srcs[build_ctest.c]
+)

@@ -1,0 +1,28 @@
+# Copyright 2018 Schibsted
+
+CONFIG(
+	rules[
+		# Include our custom rules.
+		rules.ninja
+	]
+	ruledeps[
+		# Marks that whenever the file named by $mksections is modified
+		# then all targets using the mksections rule should be re-run.
+		mksections:$mksections
+	]
+)
+
+PROG(usection
+	srcs[
+		*.c
+	]
+	specialsrcs[
+		# rule:input:output
+		# The rule is defined in rules.ninja added above.
+		mksections:NamesList.txt.bz2:sections.h
+	]
+	deps[
+		# sections.h must exist before main.c is compiled.
+		main.c:sections.h
+	]
+)

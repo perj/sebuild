@@ -1,0 +1,7 @@
+# Copyright 2018 Schibsted
+
+GOPROG(gopath
+)
+
+GOTEST(gopath
+)

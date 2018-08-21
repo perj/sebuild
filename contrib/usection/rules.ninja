@@ -1,0 +1,6 @@
+# Copyright 2018 Schibsted
+
+mksections = ./mksections.pl
+rule mksections
+    command = $mksections $in > $out || ( rm -f $out ; exit 1 )
+    description = mksections $out

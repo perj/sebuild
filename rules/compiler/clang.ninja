@@ -1,0 +1,6 @@
+# Copyright 2018 Schibsted
+
+warncompiler=-Wno-parentheses-equality
+
+# This variable can be used in Builddescs to disable this warning.
+w_no_self_assign=-Wno-self-assign

@@ -1,0 +1,9 @@
+# Copyright 2018 Schibsted
+
+CONFIG(
+	config_script[scripts/seb_config.sh]
+)
+
+COMPONENT([
+	.
+])

@@ -1,0 +1,8 @@
+# Copyright 2018 Schibsted
+
+COMPONENT([
+	cmd/seb
+	internal/tools
+	pkg/buildbuild
+	rules
+])

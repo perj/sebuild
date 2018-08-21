@@ -1,0 +1,212 @@
+# Copyright 2018 Schibsted
+
+rule cxx
+    command = $cxx $picflag $flavor_cflags $cflags $cxxflags $cwarnflags $gcov_copts $copts $srcopts -I. -I$incdir $includes $defines -MMD -MF $out.d -MT $out -c $in -o $out
+    depfile = $out.d
+    description = C++ compile $out
+
+rule cc
+    command = $cc $picflag $flavor_cflags $cflags $conlyflags $cwarnflags $gcov_copts $copts $srcopts -I. -I$incdir $includes $defines -MMD -MF $out.d -MT $out -c $in -o $out
+    depfile = $out.d
+    description = C compile $out
+
+rule cxx_analyse
+    command = rm -rf $out ; mkdir -p $out ; clang++ $analyser_flags $picflag $flavor_cflags $cflags $cxxflags $cwarnflags $gcov_copts $copts $srcopts -I. -I$incdir $includes $defines $in -o $out
+    description = C++ analyse $out
+
+rule cc_analyse
+    command = rm -rf $out ; mkdir -p $out ; clang $analyser_flags $picflag $flavor_cflags $cflags $conlyflags $cwarnflags $gcov_copts $copts $srcopts -I. -I$incdir $includes $defines $in -o $out
+    description = C analyse $out
+
+analyse_tool = $buildtooldir/internal/tools/copy_analyse.pl
+rule copy_analyse
+    command = $analyse_tool $out $in
+    description = Copy analyse to $out
+
+rule final_analyse
+    command = $analyse_tool -final $out $in
+    description = Final analyse in $out
+
+link_wrapper = $buildtooldir/internal/tools/link.pl
+rule linkxx
+    command = $link_wrapper $cxx $ldflags $ldopts $gcov_ldopts -L $libdir -L $scmcoord_contrib/lib -o $out @$out.rsp $ldlibs
+    description = link $out
+    rspfile = $out.rsp
+    rspfile_content = $in
+
+rule link
+    command = $link_wrapper $cc $ldflags $ldopts $gcov_ldopts -L $libdir -L $scmcoord_contrib/lib -o $out @$out.rsp $ldlibs
+    description = link $out
+    rspfile = $out.rsp
+    rspfile_content = $in
+
+rule partiallink
+    command = $link_wrapper ld -r -o $out @$out.rsp
+    description = partially linking $out
+    rspfile = $out.rsp
+    rspfile_content = $in
+
+rule ar
+    command = ar cr $out $in
+    description = ar library $out
+
+rule flexx
+    command = flex -+ -o$out $in
+    description = lex $out
+
+rule yaccxx
+    command = bison -y -d --debug -o $out $in
+    description = yacc $out
+
+rule install_conf
+    command = install -m0644 $in $out
+    description = copy $in to $out
+
+rule install_script
+    command = install -m0755 $in $out
+    description = copy $in to $out
+
+rule install_header
+    command = $buildtooldir/internal/tools/header-install.sh $in $out
+    description = copy header to $out
+
+rule install_py
+    command = $buildtooldir/internal/tools/python-install.sh $in $out
+    description = python copy $in to $out
+
+rule install_php
+    command = php -l $in > /dev/null && install -m0644 $in $out
+    description = php syntax check and copy $in to $out
+
+rule copy_go
+    command = $buildtooldir/internal/tools/go-install.sh $in $out
+    description = go fmt check and copy $in to $out
+
+rule concat
+    command = cat $in > $out
+    description = concatenate $in to $out
+
+gperf_enum = $buildtooldir/internal/tools/gperf_enum.pl
+rule gperf_enum
+    command = $gperf_enum $out $in
+    description = gperf_enum $out
+
+rule gperf_switch
+    command = $gperf_enum -s $out $in
+    description = gperf_enum $out
+
+rule gperf
+    command = gperf -L ANSI-C --output-file=$out $in
+    description = gperf $out
+
+rule build_version
+    command = echo \#define BUILD_VERSION \"$buildversion\" > $out
+
+rule swig_python
+    command=swig -python -threads -O -o $out $in
+
+rule swig_python_header
+    command=$buildtooldir/internal/tools/swig_header.sh $in $out -python -threads -O
+
+rule generate_ninjas
+    command = BUILD_BUILD_FROM_NINJA=1 CC="$cc" BUILDTOOLDIR="$buildtooldir" $build_build
+    generator=
+
+# Since go bulid runs install dependency packages they can't be run in
+# parallel, only allow one at a time per mode. We have surprisingly
+# many modes.
+
+pool gobuilds_prog
+    depth = 1
+pool gobuilds_prog-nocgo
+    depth = 1
+pool gobuilds_lib
+    depth = 1
+pool gobuilds_test
+    depth = 1
+pool gobuilds_bench
+    depth = 1
+pool gobuilds_cover
+    depth = 1
+pool gobuilds_cover_html
+    depth = 1
+
+rule gobuild
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
+    depfile = $objdir/depfile
+    description = building go program $out from $in
+    pool = gobuilds_$gomode
+
+rule gobuildlib
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir" && objcopy --rename-section .init_array=go_init --globalize-symbol=_rt0_`go env GOARCH`_`go env GOOS`_lib "$out"
+    depfile = $depfile
+    description = building go library $out from $in
+    pool = gobuilds_$gomode
+
+rule gotest
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" test "$builddir"
+    description = testing go package in $in
+    pool = gobuilds_test
+
+rule gobench
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "" "$benchflags" "-I $incdir $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" bench "$builddir"
+    description = benching go package in $in
+    pool = gobuilds_bench
+
+rule gocover
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover "$builddir"
+    depfile = $objdir/depfile
+    description = testing coverage of go package in $in
+    pool = gobuilds_cover
+
+rule gocover_html
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover_html "$builddir"
+    description = coverage to html of go package in $in
+    pool = gobuilds_cover_html
+
+rule goaddmain
+    command = install -m644 "$in" "$out"
+    description = setup go main package $out
+
+rule symlink
+    # Need to rm $out first, otherwise might try to create $out/$(basename $out)
+    # GNU has -T flag but this is more compatible.
+    command = rm -f $out && ln -sf $target $out
+    description = symlinking $out
+
+rule protocc
+    command = protoc --proto_path=$$(dirname $in) --cpp_out=$$(dirname $out) $in
+
+rule download
+    command = ( curl -s -L -o $out $$(head -1 $in) && test "$$(sha256sum $out)" = "$$(tail -1 $in)  $out" ) || ( rm -f $out ; exit 1 )
+    description = Downloading url from $in
+
+rule unzip
+    command = unzip -p $in $file > $out || ( rm -f $out ; exit 1 )
+    description= Unzip $file from $in
+
+rule bunzip2
+    command = rm -rf $out ; bunzip2 --keep --quiet --stdout $in > $out
+depend_rule_bunzip2=/dev/null
+
+rule untar
+    command = tar -x -O -f $in $file > $out || ( rm -f $out ; exit 1 )
+    description= Untar $file from $in
+
+ronn_wrapper = $buildtooldir/internal/tools/ronn_wrapper.sh
+rule ronn
+    command = $ronn_wrapper $in $out
+    description = Generate man page using ronn
+
+# The following rules depend on variables that are defined in
+# toolrules.ninja. The reason for this is that they in turn
+# depend on paths defined by per-flavor ninja files.
+
+intool = $buildtooldir/internal/tools/in.pl
+rule in
+    command = $intool "$inconf" $in $out
+    restat=1
+
+rule inconfig
+    command = echo '$out: $in '>$out.d; depfile=$out.d $inconfig $in > $out || ( rm $out ; exit 1 )
+    depfile = $out.d

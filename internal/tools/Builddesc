@@ -1,0 +1,6 @@
+INSTALL(share/seb/internal/tools
+	scripts[
+		*.sh
+		*.pl
+	]
+)

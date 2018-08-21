@@ -1,0 +1,11 @@
+# Copyright 2018 Schibsted
+
+rule persist_cc
+    command = test "$cc" = "env cc" && touch $out
+
+rule test_zlib_config
+    command = test -n "$zlib_config" && touch $out
+
+rule echo_names
+    command = for a in $in ; do echo $$a ; done | LANG=C sort > $out
+depend_rule_echo_names=/dev/null
