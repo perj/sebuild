@@ -2,6 +2,7 @@
 
 COMPONENT([
 	cmd/seb
+	internal/assets
 	internal/tools
 	pkg/buildbuild
 	rules

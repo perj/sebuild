@@ -1,0 +1,5 @@
+INSTALL(share/seb/internal/assets
+	conf[
+		main.go
+	]
+)
