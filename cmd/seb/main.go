@@ -6,7 +6,7 @@
 // about this tool.
 package main
 
-//go:generate go-bindata -nomemcopy -prefix ../../ ../../internal/tools ../../rules/...
+//go:generate go-bindata -nomemcopy -ignore Builddesc -prefix ../../ ../../internal/... ../../rules/...
 
 import (
 	"flag"
