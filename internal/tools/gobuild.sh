@@ -25,8 +25,8 @@ ldflags="$6"
 mode="$7"
 pkgdir="$8"
 
-READLINK="$(type -p greadlink readlink | head -1)"
-ABSIN="$($READLINK -f "${IN:-.}")"
+
+ABSIN="$(cd "${IN:-.}" ; pwd)"
 
 # Convert relative paths to absolute, since go will change directory.
 CGO_CFLAGS=""
@@ -61,9 +61,8 @@ orig_IFS="$IFS"
 IFS=":"
 gopath=""
 for p in $GOPATH; do
-	ABSP=$($READLINK -f $p)
+	ABSP="$(cd "$p" 2>/dev/null && pwd)"
 	[ -z "$ABSP" ] && continue
-	[ -z "$PKG" ] && [ "${ABSIN#$ABSP/src/}" != "$ABSIN" ] && PKG="${ABSIN#$ABSP/src/}"
 	gopath="$gopath:$ABSP"
 done
 IFS="$orig_IFS"
@@ -74,7 +73,7 @@ if [ -z "$mode" ]; then
 	mode="prog"
 fi
 
-BUILDFLAGS="-i -pkgdir $($READLINK -f $pkgdir)/gopkg_$mode -installsuffix=$mode"
+BUILDFLAGS="-i -pkgdir $(cd "$pkgdir" ; pwd)/gopkg_$mode -installsuffix=$mode"
 
 if [ "$mode" = "test" ]; then
 	[ -z "$PKG" ] && cd "$ABSIN"
@@ -85,15 +84,16 @@ if [ "$mode" = "bench" ]; then
 	exec go test $PKG -bench $4
 fi
 if [ "$mode" = "cover_html" ]; then
-	exec go tool cover -html=$IN -o $OUT
+	exec go tool cover -html=$IN -o "$OUT"
 fi
 
-out="$($READLINK -f $OUT)"
+# XXX Is there a better way? Except for GNU readlink which we can't assume.
+out="$(cd "$(dirname "$OUT")" ; pwd)/$(basename "$OUT")"
 
 [ -z "$PKG" ] && pushd "$ABSIN" > /dev/null
 
 if [ "$mode" = "cover" ]; then
-	go test -coverprofile=$out $PKG
+	go test -coverprofile="$out" $PKG
 	[ -z "$PKG" ] && popd > /dev/null
 else
 	if [ "$mode" = prog-nocgo ]; then
@@ -116,7 +116,7 @@ else
 		fi
 		[ -z "$PKG" ] && popd > /dev/null
 		# If there weren't any exports the header won't be created, but we expected it to be there.
-		touch "$($READLINK -f ${OUT%.a}.h)"
+		touch "${OUT%.a}.h"
 	fi
 fi
 

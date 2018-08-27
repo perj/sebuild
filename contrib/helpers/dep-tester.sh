@@ -13,7 +13,7 @@ rm -rf $BUILDPATH
 
 $BUILDBUILD $BUILDBUILD_ARGS
 
-ninja -f $BUILDPATH/build.ninja -n -t targets | grep -vE '(analyse|gotest|gobench)' | sed -r 's,:[^:]+$,,' > $BUILDPATH/test-targets
+ninja -f $BUILDPATH/build.ninja -n -t targets | grep -vE '(analyse|gotest|gobench)' | sed 's/:[^:]\{1,\}$//' > $BUILDPATH/test-targets
 
 err=0
 for a in `cat $BUILDPATH/test-targets` ; do
