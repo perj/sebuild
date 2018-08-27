@@ -3,6 +3,7 @@
 package buildbuild
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -125,73 +126,77 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	if err != nil {
 		return err
 	}
+	defer topfile.Close()
+	// Using bufio.Writer allows us to skip error checking until Flush.
+	w := bufio.NewWriter(topfile)
+
 	// While we usually use $buildpath to refer to the top path
 	// ninja treats $builddir specially so set it as well.
-	fmt.Fprintf(topfile, "builddir=%s\n", toppath)
-	fmt.Fprintf(topfile, "buildpath=%s\n", toppath)
-	fmt.Fprintf(topfile, "cc=%s\n", ops.CC)
-	fmt.Fprintf(topfile, "cxx=%s\n", ops.CXX)
-	fmt.Fprintf(topfile, "gopath=$$GOPATH\n")
-	fmt.Fprintf(topfile, "build_build = %s\n", strings.Join(os.Args, " "))
-	fmt.Fprintf(topfile, "buildtooldir=%s\n", ops.BuildtoolDir())
-	fmt.Fprintf(topfile, "inconfig = $buildtooldir/scripts/invars.sh\n")
+	fmt.Fprintf(w, "builddir=%s\n", toppath)
+	fmt.Fprintf(w, "buildpath=%s\n", toppath)
+	fmt.Fprintf(w, "cc=%s\n", ops.CC)
+	fmt.Fprintf(w, "cxx=%s\n", ops.CXX)
+	fmt.Fprintf(w, "gopath=$$GOPATH\n")
+	fmt.Fprintf(w, "build_build = %s\n", strings.Join(os.Args, " "))
+	fmt.Fprintf(w, "buildtooldir=%s\n", ops.BuildtoolDir())
+	fmt.Fprintf(w, "inconfig = $buildtooldir/scripts/invars.sh\n")
 	cv := strings.TrimSpace(strings.Join(ops.Config.Configvars, " "))
 	if cv == "" {
 		cv = "/dev/null"
 	}
-	fmt.Fprintf(topfile, "configvars = %s\n", cv)
-	fmt.Fprintf(topfile, "include $buildtooldir/rules/defaults.ninja\n")
+	fmt.Fprintf(w, "configvars = %s\n", cv)
+	fmt.Fprintf(w, "include $buildtooldir/rules/defaults.ninja\n")
 	for _, bp := range ops.Config.Buildparams {
-		fmt.Fprintln(topfile, bp)
+		fmt.Fprintln(w, bp)
 	}
 	if ops.Config.CompilerRuleDir != "" {
 		pth := ops.Config.CompilerRuleDir + "/" + ops.CompilerFlavor + ".ninja"
 		if ops.StatRulePath(pth) {
-			fmt.Fprintf(topfile, "include %s\n", pth)
+			fmt.Fprintf(w, "include %s\n", pth)
 		}
 	}
 	for _, cv := range ops.Config.Configvars {
-		fmt.Fprintf(topfile, "include %s\n", cv)
+		fmt.Fprintf(w, "include %s\n", cv)
 	}
 	for _, r := range ops.Config.Rules {
-		fmt.Fprintf(topfile, "include %s\n", r)
+		fmt.Fprintf(w, "include %s\n", r)
 	}
-	fmt.Fprintf(topfile, "include $buildtooldir/rules/rules.ninja\n")
+	fmt.Fprintf(w, "include $buildtooldir/rules/rules.ninja\n")
 	if len(ops.Config.Godeps) > 0 {
-		fmt.Fprintf(topfile, "build %s: godeps %s\n", ops.GodepsStamp(),
+		fmt.Fprintf(w, "build %s: godeps %s\n", ops.GodepsStamp(),
 			strings.Join(ops.Config.Godeps, " "))
 		mkpath(toppath, "obj/_go")
 	}
 
 	for _, f := range ops.Config.ActiveFlavors {
 		ops.OutputFlavor(toppath, f)
-		fmt.Fprintf(topfile, "subninja %s/obj/%s/build.ninja\n", toppath, f)
+		fmt.Fprintf(w, "subninja %s/obj/%s/build.ninja\n", toppath, f)
 	}
 	sort.Strings(ops.Builddescs)
 	prevbd := ""
 	for _, bd := range ops.Builddescs {
 		if bd != prevbd {
-			fmt.Fprintf(topfile, "build %s: phony\n", bd)
+			fmt.Fprintf(w, "build %s: phony\n", bd)
 		}
 		prevbd = bd
 	}
 
-	fmt.Fprintf(topfile, "build %s/build.ninja: generate_ninjas", toppath)
+	fmt.Fprintf(w, "build %s/build.ninja: generate_ninjas", toppath)
 	for _, bd := range ops.Builddescs {
 		if bd != prevbd {
-			fmt.Fprint(topfile, " ", bd)
+			fmt.Fprint(w, " ", bd)
 		}
 		prevbd = bd
 	}
 	for _, pd := range ops.PluginDeps() {
-		fmt.Fprint(topfile, " ", filepath.Join(pd.ppath, pd.Name()))
+		fmt.Fprint(w, " ", filepath.Join(pd.ppath, pd.Name()))
 	}
-	fmt.Fprintln(topfile)
+	w.WriteByte('\n')
 
-	fmt.Fprintf(topfile, "build all: phony %s\n", strings.Join(ops.Config.ActiveFlavors, " "))
-	fmt.Fprintf(topfile, "default all\n")
+	fmt.Fprintf(w, "build all: phony %s\n", strings.Join(ops.Config.ActiveFlavors, " "))
+	fmt.Fprintf(w, "default all\n")
 
-	return topfile.Close()
+	return w.Flush()
 }
 
 func (ops *GlobalOps) SetBuildversion() {
@@ -237,20 +242,21 @@ func (ops *GlobalOps) OutputFlavor(topdir, flavor string) {
 	if err != nil {
 		panic(err)
 	}
+	w := bufio.NewWriter(flfile)
 	// Buildvars is separate here because we need to be able to include it from invars.sh
-	fmt.Fprintf(flfile, "buildvars=%s\n", buildvars)
-	fmt.Fprintf(flfile, "include $buildvars\n")
+	fmt.Fprintf(w, "buildvars=%s\n", buildvars)
+	fmt.Fprintf(w, "include $buildvars\n")
 
 	if ops.Config.FlavorRuleDir != "" {
 		pth := ops.Config.FlavorRuleDir + "/" + flavor + ".ninja"
 		if ops.StatRulePath(pth) {
-			fmt.Fprintf(flfile, "include %s\n", pth)
+			fmt.Fprintf(w, "include %s\n", pth)
 		}
 	}
 	if ops.Config.CompilerFlavorRuleDir != "" {
 		pth := ops.Config.CompilerFlavorRuleDir + "/" + ops.CompilerFlavor + "-" + flavor + ".ninja"
 		if ops.StatRulePath(pth) {
-			fmt.Fprintf(flfile, "include %s\n", pth)
+			fmt.Fprintf(w, "include %s\n", pth)
 		}
 	}
 	var evs []string
@@ -259,14 +265,14 @@ func (ops *GlobalOps) OutputFlavor(topdir, flavor string) {
 	}
 	evs = append(evs, ops.Config.Extravars...)
 	for _, ev := range evs {
-		fmt.Fprintf(flfile, "include %s\n", ev)
+		fmt.Fprintf(w, "include %s\n", ev)
 	}
-	fmt.Fprintf(flfile, "include $buildtooldir/rules/static.ninja\n")
+	fmt.Fprintf(w, "include $buildtooldir/rules/static.ninja\n")
 	for sn := range subninjas {
-		fmt.Fprintf(flfile, "subninja %s/%s.ninja\n", builddir, sn)
+		fmt.Fprintf(w, "subninja %s/%s.ninja\n", builddir, sn)
 	}
 
-	fmt.Fprintf(flfile, "build %s/analyse: final_analyse", builddir)
+	fmt.Fprintf(w, "build %s/analyse: final_analyse", builddir)
 	for _, an := range ops.Analyses {
 		if len(an.OnlyForFlavors) > 0 {
 			found := false
@@ -280,12 +286,15 @@ func (ops *GlobalOps) OutputFlavor(topdir, flavor string) {
 				continue
 			}
 		}
-		fmt.Fprintf(flfile, " %s/%s", builddir, an.TargetName)
+		fmt.Fprintf(w, " %s/%s", builddir, an.TargetName)
 	}
-	fmt.Fprintf(flfile, "\n")
+	w.WriteByte('\n')
 
-	fmt.Fprintf(flfile, "build %s: phony %s\n", flavor, strings.Join(defaults, " "))
+	fmt.Fprintf(w, "build %s: phony %s\n", flavor, strings.Join(defaults, " "))
 
+	if err := w.Flush(); err != nil {
+		panic(err)
+	}
 	flfile.Close()
 
 	// We need to be careful when writing the buildvars file. Since something (usually inconf) depends on buildvars
@@ -336,7 +345,9 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 		panic(err)
 	}
 
-	desc.OutputHeader(descfile, objdir)
+	w := bufio.NewWriter(descfile)
+
+	desc.OutputHeader(w, objdir)
 
 	for tname, target := range desc.AllTargets() {
 		deps := desc.ResolveDeps(ops, tname)
@@ -350,26 +361,29 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 		orderDeps := desc.ResolveOrderDeps(target)
 		srcs := desc.ResolveSrcs(ops, tname, target.Sources...)
 
-		fmt.Fprintf(descfile, "build %s: %s ", dest, rule)
-		fmt.Fprint(descfile, strings.Join(srcs, " "))
+		fmt.Fprintf(w, "build %s: %s ", dest, rule)
+		fmt.Fprint(w, strings.Join(srcs, " "))
 
 		if len(deps) > 0 {
-			fmt.Fprint(descfile, " | ", strings.Join(deps, " "))
+			fmt.Fprint(w, " | ", strings.Join(deps, " "))
 		}
 		if len(orderDeps) > 0 {
-			fmt.Fprint(descfile, " || ", strings.Join(orderDeps, " "))
+			fmt.Fprint(w, " || ", strings.Join(orderDeps, " "))
 		}
-		fmt.Fprintln(descfile)
+		fmt.Fprintln(w)
 		for _, ea := range target.Extraargs {
-			fmt.Fprint(descfile, "    ", ea, "\n")
+			fmt.Fprint(w, "    ", ea, "\n")
 		}
 		if len(target.Srcopts) > 0 {
-			fmt.Fprint(descfile, "    srcopts=", strings.Join(target.Srcopts, " "), "\n")
+			fmt.Fprint(w, "    srcopts=", strings.Join(target.Srcopts, " "), "\n")
 		}
 		if target.Options["all"] {
-			fmt.Fprintf(descfile, "default %s\n", dest)
+			fmt.Fprintf(w, "default %s\n", dest)
 			defaults = append(defaults, dest)
 		}
+	}
+	if err := w.Flush(); err != nil {
+		panic(err)
 	}
 	descfile.Close()
 	return defaults
