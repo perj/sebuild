@@ -5,6 +5,7 @@ package buildbuild
 import (
 	"io/ioutil"
 	"reflect"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -55,9 +56,14 @@ compiler[cc2]
 	ops := NewGlobalOps()
 	ops.ParseConfig("", s, nil)
 
+	march := runtime.GOARCH
+	if march == "amd64" {
+		march = "x86_64"
+	}
+
 	c := &ops.Config
 	e := &Config{
-		Conditions:            map[string]bool{"pbuild": true},
+		Conditions:            map[string]bool{"pbuild": true, runtime.GOOS: true, march: true},
 		Buildparams:           nil,
 		AllFlavors:            map[string]bool{"a": true, "b": true, "c": true},
 		ActiveFlavors:         []string{"a", "b", "c"},
