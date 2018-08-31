@@ -36,13 +36,11 @@ fi
 
 setval BUILD_STAGE `echo $buildflavor | tr [:lower:] [:upper:]`
 
-setval READLINK $(type -p greadlink readlink | head -1)
-
 oldifs="$IFS"
 IFS=":"
 gp=""
 for p in $gopath; do
-	ABSP=$($READLINK -f $p || true)
+	ABSP=$( ( cd "$p" 2>/dev/null && pwd ) || true)
 	[ -z "$ABSP" ] && continue
 	gp="$gp:$ABSP"
 done
