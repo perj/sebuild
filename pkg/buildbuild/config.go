@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"strings"
 )
 
@@ -119,6 +120,13 @@ func (ops *GlobalOps) DefaultConfig() {
 	ops.Config.CompilerRuleDir = "$buildtooldir/rules/compiler"
 	ops.Config.FlavorRuleDir = "$buildtooldir/rules/flavor"
 	ops.Config.CompilerFlavorRuleDir = "$buildtooldir/rules/compiler-flavor"
+
+	ops.Config.Conditions[runtime.GOOS] = true
+	if runtime.GOARCH == "amd64" {
+		ops.Config.Conditions["x86_64"] = true
+	} else {
+		ops.Config.Conditions[runtime.GOARCH] = true
+	}
 
 	ops.FlavorConfigs = make(map[string]*FlavorConfig)
 }
