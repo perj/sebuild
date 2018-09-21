@@ -26,7 +26,7 @@ mode="$7"
 pkgdir="$8"
 
 
-ABSIN="$(cd "${IN:-.}" ; pwd)"
+ABSIN="$(cd "${IN:-.}" 2>/dev/null ; pwd)"
 
 # Convert relative paths to absolute, since go will change directory.
 CGO_CFLAGS=""
@@ -84,6 +84,9 @@ if [ "$mode" = "bench" ]; then
 	exec go test $PKG -bench $4
 fi
 if [ "$mode" = "cover_html" ]; then
+	# If we have a GOPATH then disable go modules or go 1.11 might fail
+	# to find the package due to assuming it to on based on $PWD.
+	[ -n "$GOPATH" ] && export GO111MODULE=off
 	exec go tool cover -html=$IN -o "$OUT"
 fi
 
