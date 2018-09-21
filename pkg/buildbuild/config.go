@@ -128,6 +128,8 @@ func (ops *GlobalOps) DefaultConfig() {
 		ops.Config.Conditions[runtime.GOARCH] = true
 	}
 
+	ops.Config.Ruledeps["in"] = []string{"$inconf", "$intool", "$configvars"}
+
 	ops.FlavorConfigs = make(map[string]*FlavorConfig)
 }
 

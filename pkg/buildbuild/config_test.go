@@ -74,12 +74,15 @@ compiler[cc2]
 		CompilerRuleDir:       "$buildtooldir/rules/compiler",
 		FlavorRuleDir:         "$buildtooldir/rules/flavor",
 		CompilerFlavorRuleDir: "$buildtooldir/rules/compiler-flavor",
-		Ruledeps:              map[string][]string{"q": []string{"qtool", "ztool", "xtool"}},
-		Buildvars:             []string{"foo2", "foo"},
-		Compiler:              []string{"cc", "cc2"},
-		BuildversionScript:    "bv.sh",
-		Buildpath:             "buildpath",
-		ConfigScript:          "./config_script.sh",
+		Ruledeps: map[string][]string{
+			"q":  []string{"qtool", "ztool", "xtool"},
+			"in": []string{"$inconf", "$intool", "$configvars"},
+		},
+		Buildvars:          []string{"foo2", "foo"},
+		Compiler:           []string{"cc", "cc2"},
+		BuildversionScript: "bv.sh",
+		Buildpath:          "buildpath",
+		ConfigScript:       "./config_script.sh",
 	}
 
 	if !reflect.DeepEqual(c, e) {
