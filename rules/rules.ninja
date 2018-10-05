@@ -177,6 +177,9 @@ rule symlink
 rule protocc
     command = protoc --proto_path=$$(dirname $in) --cpp_out=$$(dirname $out) $in
 
+rule protoc-c
+    command = protoc-c --proto_path=$$(dirname $in) --c_out=$$(dirname $out) $in
+
 rule download
     command = ( curl -s -L -o $out $$(head -1 $in) && test "$$(sha256sum $out)" = "$$(tail -1 $in)  $out" ) || ( rm -f $out ; exit 1 )
     description = Downloading url from $in
