@@ -31,8 +31,9 @@ func (p *ProgDesc) Finalize(ops *GlobalOps) {
 	objs = append(objs, ops.ResolveLibsOurStatic(p.Libs)...)
 
 	ldlibs := ops.ResolveLibsExternal(p.Libs)
+	link := ops.ResolveLibsLinker(p.Link, p.Libs)
 	eas := []string{"ldlibs=" + strings.Join(ldlibs, " ")}
-	p.AddTarget(prog, p.Link, objs, p.Destdir, "", eas, p.TargetOptions)
+	p.AddTarget(prog, link, objs, p.Destdir, "", eas, p.TargetOptions)
 
 	p.FinalizeAnalyse(ops)
 	p.GeneralDesc.Finalize(ops)
