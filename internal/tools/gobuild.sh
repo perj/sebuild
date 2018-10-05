@@ -94,7 +94,7 @@ fi
 out="$(cd "$(dirname "$OUT")" ; pwd)/$(basename "$OUT")"
 depfile="$(cd "$(dirname "$DEPFILE")" ; pwd)/$(basename "$DEPFILE")"
 
-if [ -z "$PKG" ] && [ -n "$(go env GOMOD 2>/dev/null)" ]; then
+if [ -z "$PKG" ] && [ -n "$(cd "$ABSIN" 2>/dev/null && go env GOMOD 2>/dev/null)" ]; then
 	PKG="./$IN"
 fi
 [ -z "$PKG" ] && cd "$ABSIN" > /dev/null
