@@ -14,6 +14,7 @@ type LibDescriptor interface {
 	NameAsLib() (name string, islib bool)
 	NameAsPiclib() (name string, islib bool)
 	LibDeps() []string
+	Linker() string
 }
 
 type LibDesc struct {
@@ -109,6 +110,10 @@ func (l *LibDesc) NameAsPiclib() (string, bool) {
 
 func (l *LibDesc) LibDeps() []string {
 	return l.Libs
+}
+
+func (l *LibDesc) Linker() string {
+	return l.Link
 }
 
 var LibTemplate = LibDesc{
@@ -232,4 +237,17 @@ func (ops *GlobalOps) ResolveLibsOurPicAsLib(libs []string) ([]string, []string)
 		}
 	}
 	return objs, llibs
+}
+
+func (ops *GlobalOps) ResolveLibsLinker(link string, libs []string) string {
+	for _, lib := range ops.ResolveLibsOur(libs) {
+		llink := lib.Linker()
+		if llink != "link" && llink != "" && llink != link {
+			if link != "link" && link != "" {
+				panic("Multiple custom linkers, got " + link + " and " + llink)
+			}
+			link = llink
+		}
+	}
+	return link
 }

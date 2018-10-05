@@ -31,8 +31,9 @@ func (m *ModuleDesc) Finalize(ops *GlobalOps) {
 	objs = append(objs, ops.ResolveLibsOurPic(m.Libs)...)
 
 	ldlibs := ops.ResolveLibsExternal(m.Libs)
+	link := ops.ResolveLibsLinker(m.Link, m.Libs)
 	eas := []string{"ldflags=-rdynamic -fPIC -shared", "ldlibs=" + strings.Join(ldlibs, " ")}
-	m.AddTarget(mod, m.Link, objs, m.Destdir, "", eas, m.TargetOptions)
+	m.AddTarget(mod, link, objs, m.Destdir, "", eas, m.TargetOptions)
 
 	m.FinalizeAnalyse(ops)
 	m.GeneralDesc.Finalize(ops)
