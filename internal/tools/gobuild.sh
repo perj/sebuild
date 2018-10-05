@@ -92,21 +92,22 @@ fi
 
 # XXX Is there a better way? Except for GNU readlink which we can't assume.
 out="$(cd "$(dirname "$OUT")" ; pwd)/$(basename "$OUT")"
+depfile="$(cd "$(dirname "$DEPFILE")" ; pwd)/$(basename "$DEPFILE")"
 
-[ -z "$PKG" ] && pushd "$ABSIN" > /dev/null
+if [ -z "$PKG" ] && [ -n "$(cd "$ABSIN" 2>/dev/null && go env GOMOD 2>/dev/null)" ]; then
+	PKG="./$IN"
+fi
+[ -z "$PKG" ] && cd "$ABSIN" > /dev/null
 
 if [ "$mode" = "cover" ]; then
 	go test -coverprofile="$out" $PKG
-	[ -z "$PKG" ] && popd > /dev/null
 else
 	if [ "$mode" = prog-nocgo ]; then
 		CGO_ENABLED=0
 		export CGO_ENABLED
 		go build $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
-		[ -z "$PKG" ] && popd > /dev/null
 	elif [ -z "$mode" ] || [ "$mode" = prog ]; then
 		go build $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
-		[ -z "$PKG" ] && popd > /dev/null
 	else
 		# go build links an executable to extract the symbols. If this is a plugin there'll be
 		# unresolved symbols. Ignore now, handle in final link.
@@ -117,10 +118,9 @@ else
 		else
 			go build $BUILDFLAGS -buildmode=c-archive -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
 		fi
-		[ -z "$PKG" ] && popd > /dev/null
 		# If there weren't any exports the header won't be created, but we expected it to be there.
 		touch "${OUT%.a}.h"
 	fi
 fi
 
-(cd $ABSIN ; echo -n "$OUT: " ; go list -f "${PKG:-.}"' {{range .Deps}}{{.}} {{end}}' $PKG | xargs go list -f '{{$dir:=.Dir}}{{range .GoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CgoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .HFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .TestGoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}') | tr "\n" " " > $DEPFILE || exit 1
+( echo -n "$OUT: " ; go list -f "${PKG:-.}"' {{range .Deps}}{{.}} {{end}}' $PKG | xargs go list -f '{{$dir:=.Dir}}{{range .GoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CgoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .HFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .TestGoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}' ) | tr "\n" " " > "$depfile" || exit 1
