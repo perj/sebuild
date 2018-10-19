@@ -39,9 +39,12 @@ func (tmpl *LinkDesc) NewFromTemplate(bd, tname string, flavors []string) *LinkD
 
 type ParseLinkerParam func(l *LinkDesc, args []string)
 
+var linkerBuildvars = []string{"copts", "cflags", "cxxflags", "conlyflags", "cwarnflags"}
+
 // Return keys handled by LinkDesc.Parse to pass to GenericParse
 func LinkerExtra(extra ...string) []string {
-	extra = append(extra, "incdirs", "no_analyse", "libs", "copts")
+	extra = append(extra, "incdirs", "no_analyse", "libs")
+	extra = append(extra, linkerBuildvars...)
 	for k := range PluginLinkerParams {
 		extra = append(extra, k)
 	}
@@ -73,9 +76,11 @@ func (l *LinkDesc) LinkerParse(srcdir string, args map[string][]string) {
 	if args["no_analyse"] != nil {
 		l.NoAnalyse = true
 	}
-	if args["copts"] != nil {
-		// Is this cheating? I think it's ok.
-		l.Buildvars["copts"] = append(l.Buildvars["copts"], args["copts"]...)
+	for _, bv := range linkerBuildvars {
+		if args[bv] != nil {
+			// Is this cheating? I think it's ok.
+			l.Buildvars[bv] = append(l.Buildvars[bv], args[bv]...)
+		}
 	}
 
 	l.Libs = append(l.Libs, args["libs"]...)
