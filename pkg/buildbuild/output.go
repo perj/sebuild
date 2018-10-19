@@ -372,7 +372,13 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 		}
 		fmt.Fprintln(w)
 		for _, ea := range target.Extraargs {
-			fmt.Fprint(w, "    ", ea, "\n")
+			arr := strings.SplitN(ea, "=", 2)
+			if len(arr) != 2 {
+				fmt.Fprint(w, "    ", ea, "\n")
+				continue
+			}
+			arr[1] = ops.ResolveCollectedVar(strings.TrimSpace(arr[1]))
+			fmt.Fprint(w, "    ", arr[0], "=", arr[1], "\n")
 		}
 		if len(target.Srcopts) > 0 {
 			fmt.Fprint(w, "    srcopts=", strings.Join(target.Srcopts, " "), "\n")

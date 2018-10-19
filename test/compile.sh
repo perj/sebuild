@@ -9,6 +9,7 @@ touch Builddesc # to make ninja invoke seb.
 ninja -f $BUILDPATH/build.ninja
 
 grep -q gopath $BUILDPATH/regress/collect_test/hejsan.txt
+grep -q gopath $BUILDPATH/regress/collect_test/other.txt
 grep -q bar $BUILDPATH/obj/regress/lib/test
 
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gotest/gopath
