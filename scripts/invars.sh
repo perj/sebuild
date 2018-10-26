@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Copyright 2018 Schibsted
 
 if [ $# -lt 1 ] ; then

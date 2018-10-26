@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Copyright 2018 Schibsted
 
 # Brute force wrapper script to integrate building go code into our
