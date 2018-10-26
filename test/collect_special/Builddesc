@@ -2,5 +2,9 @@
 
 INSTALL(collect_test
 	specialsrcs[echo_names:$_gocover:hejsan.txt]
-	conf[hejsan.txt]
+	specialsrcs[echo_other::other.txt:other=$_gocover]
+	conf[
+		hejsan.txt
+		other.txt
+	]
 )

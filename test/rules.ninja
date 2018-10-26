@@ -9,3 +9,7 @@ rule test_zlib_config
 rule echo_names
     command = for a in $in ; do echo $$a ; done | LANG=C sort > $out
 depend_rule_echo_names=/dev/null
+
+rule echo_other
+    command = for a in $other ; do echo $$a ; done | LANG=C sort > $out
+depend_rule_echo_names=/dev/null
