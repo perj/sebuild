@@ -112,57 +112,44 @@ rule generate_ninjas
     command = BUILD_BUILD_FROM_NINJA=1 CC="$cc" BUILDTOOLDIR="$buildtooldir" $build_build
     generator=
 
-# Since go bulid runs install dependency packages they can't be run in
-# parallel, only allow one at a time per mode. We have surprisingly
-# many modes.
+# Since go build runs install dependency packages they can't be run in
+# parallel, they would stomp on each-others download.
 
-pool gobuilds_prog
-    depth = 1
-pool gobuilds_prog-nocgo
-    depth = 1
-pool gobuilds_lib
-    depth = 1
-pool gobuilds_test
-    depth = 1
-pool gobuilds_bench
-    depth = 1
-pool gobuilds_cover
-    depth = 1
-pool gobuilds_cover_html
+pool gobuilds
     depth = 1
 
 rule gobuild
     command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
     depfile = $objdir/depfile
     description = building go program $out from $in
-    pool = gobuilds_$gomode
+    pool = gobuilds
 
 rule gobuildlib
     command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir" && objcopy --rename-section .init_array=go_init --globalize-symbol=_rt0_`go env GOARCH`_`go env GOOS`_lib "$out"
     depfile = $depfile
     description = building go library $out from $in
-    pool = gobuilds_$gomode
+    pool = gobuilds
 
 rule gotest
     command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" test "$builddir"
     description = testing go package in $in
-    pool = gobuilds_test
+    pool = gobuilds
 
 rule gobench
     command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "" "$benchflags" "-I $incdir $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" bench "$builddir"
     description = benching go package in $in
-    pool = gobuilds_bench
+    pool = gobuilds
 
 rule gocover
     command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover "$builddir"
     depfile = $objdir/depfile
     description = testing coverage of go package in $in
-    pool = gobuilds_cover
+    pool = gobuilds
 
 rule gocover_html
     command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover_html "$builddir"
     description = coverage to html of go package in $in
-    pool = gobuilds_cover_html
+    pool = gobuilds
 
 rule goaddmain
     command = install -m644 "$in" "$out"
