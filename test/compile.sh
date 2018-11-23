@@ -1,7 +1,7 @@
 #!/bin/sh
 # Copyright 2018 Schibsted
 
-set -e
+set -xe
 test -z "$BUILDPATH" && BUILDPATH=build
 
 CC='env cc' seb -condition cfoo -condition cbar
@@ -26,5 +26,8 @@ if (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.h
 touch go/src/gopath/main_test.go
 if ! (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html | grep -q 'coverage to') ; then echo "gopath-coverage.html not rebuilt with changes" ; exit 1 ; fi
 
+# Test of enabled argument
+test -f $BUILDPATH/obj/regress/lib/enabled
+! test -f $BUILDPATH/obj/regress/lib/disabled
 
 [ -n "$NODEPTEST" ] || CC='env cc' BUILDBUILD_ARGS="-condition cfoo -condition cbar" ../contrib/helpers/dep-tester.sh
