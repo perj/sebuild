@@ -33,7 +33,15 @@ var (
 	ConditionsNotAllowed = errors.New("Conditions are not allowed here")
 )
 
-func (args *Args) Parse(s *Scanner, conditions map[string]bool) {
+// Parse from s until a ) token is found, indicating the end of a descriptor.
+// Fills in *args with the arguments found, if the conditions set on the
+// argument match the ones given (if no conditions are set it's always a
+// match).
+//
+// Returns true if a `enabled` argument was found, regardless if it was saved
+// or not. Returning true and then not finding enabled in the arguments would
+// imply the descriptor should be skipped.
+func (args *Args) Parse(s *Scanner, conditions map[string]bool) (haveEnabled bool) {
 	*args = Args{
 		make(map[string][]string),
 		make(map[string]map[string][]string),
@@ -60,6 +68,9 @@ func (args *Args) Parse(s *Scanner, conditions map[string]bool) {
 				if !s.Scan() {
 					panicOrEOF(s)
 				}
+			}
+			if key == "enabled" {
+				haveEnabled = true
 			}
 		}
 		if s.Text() != "[" {
@@ -120,6 +131,7 @@ func (args *Args) Parse(s *Scanner, conditions map[string]bool) {
 		}
 	}
 	panicIfErr(s)
+	return
 }
 
 func CheckConditions(condstr string, conditions map[string]bool) bool {

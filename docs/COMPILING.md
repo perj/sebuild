@@ -522,12 +522,22 @@ always `tool/`.
 
 ### Build descriptor arguments ###
 
+#### enabled ####
+
+Can be used to disable the descriptor unless a certain flavor or condition
+matches. Use with an empty value.
+
+E.g. `enabled::foo[]` will enable this describor if the `foo` condition is set,
+but it will otherwise be disabled. You can use enabled multiple times to
+specify different conditions.
+
 #### flavors ####
 
     flavors[dev]
 
 Limits the building of this descriptor to certain flavors. See below for more
-explaination of flavors.
+explaination of flavors. Superseded by the enabled argument which does much
+of the same and more.
 
 #### srcs ####
 

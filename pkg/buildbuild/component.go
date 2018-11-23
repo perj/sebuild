@@ -90,7 +90,7 @@ func (dp *DescParser) Parse(srcdir string, s *Scanner, flavors []string) ParseFu
 	tname := s.Text()
 
 	var args Args
-	args.Parse(s, dp.Ops.Config.Conditions)
+	haveEnabled := args.Parse(s, dp.Ops.Config.Conditions)
 
 	if flavors == nil {
 		flavors = dp.Ops.Config.ActiveFlavors
@@ -114,6 +114,13 @@ func (dp *DescParser) Parse(srcdir string, s *Scanner, flavors []string) ParseFu
 		for k, v := range args.Flavors[fl] {
 			flargs[k] = append(flargs[k], v...)
 		}
+
+		// If an enabled argument exists then skip this descriptor if
+		// it's not currently set.
+		if _, ok := flargs["enabled"]; haveEnabled && !ok {
+			continue
+		}
+		delete(flargs, "enabled")
 
 		onlyForFlavors := flavors
 		if fl != "" {
