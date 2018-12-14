@@ -84,12 +84,20 @@ func (g *GoTestDesc) Finalize(ops *GlobalOps) {
 	if g.Pkg != "" {
 		eas = append(eas, "gopkg="+g.Pkg)
 	}
+
+	eas = append(eas, "gomode=test-prog")
+	target := g.AddTarget(name+".test", "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, g.TargetOptions)
+	eas = eas[:len(eas)-1]
+	AddGodeps(target, ops)
+
 	opts := map[string]bool{"incdeps": true, "libdeps": true}
-	target := g.AddTarget("gotest/"+name, "gotest", []string{g.Srcdir}, "destroot", "", eas, opts)
+	target = g.AddTarget("gotest/"+name, "gotest", []string{g.Srcdir}, "destroot", "", eas, opts)
 	AddGodeps(target, ops)
 	target.CollectAs = "_gotest"
+
 	target = g.AddTarget("gocover/"+name+"-coverage", "gocover", []string{g.Srcdir}, "destroot", "", eas, opts)
 	AddGodeps(target, ops)
+
 	target = g.AddTarget("gocover/"+name+"-coverage.html", "gocover_html", []string{"gocover/" + name + "-coverage"}, "destroot", "", eas, nil)
 	target.CollectAs = "_gocover"
 
@@ -114,4 +122,11 @@ var GoprogTemplate = GoProgDesc{
 	},
 }
 
-var GotestTemplate = GoTestDesc{}
+var GotestTemplate = GoTestDesc{
+	LinkDesc: LinkDesc{
+		GeneralDesc: GeneralDesc{
+			Destdir:       "gotest",
+			TargetOptions: map[string]bool{"all": true, "incdeps": true, "libdeps": true},
+		},
+	},
+}
