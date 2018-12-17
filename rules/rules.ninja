@@ -119,8 +119,8 @@ pool gobuilds
     depth = 1
 
 rule gobuild
-    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
-    depfile = $objdir/depfile
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile-$gomode" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
+    depfile = $objdir/depfile-$gomode
     description = building go program $out from $in
     pool = gobuilds
 
@@ -141,8 +141,8 @@ rule gobench
     pool = gobuilds
 
 rule gocover
-    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover "$builddir"
-    depfile = $objdir/depfile
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$objdir/depfile-cover" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover "$builddir"
+    depfile = $objdir/depfile-cover
     description = testing coverage of go package in $in
     pool = gobuilds
 

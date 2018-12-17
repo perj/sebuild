@@ -99,16 +99,22 @@ if [ -z "$PKG" ] && [ -n "$(cd "$ABSIN" 2>/dev/null && go env GOMOD 2>/dev/null)
 fi
 [ -z "$PKG" ] && cd "$ABSIN" > /dev/null
 
-if [ "$mode" = "cover" ]; then
-	go test -coverprofile="$out" $PKG
-else
-	if [ "$mode" = prog-nocgo ]; then
+case "$mode" in
+	cover)
+		go test -coverprofile="$out" $PKG
+	;;
+	prog-nocgo)
 		CGO_ENABLED=0
 		export CGO_ENABLED
 		go build $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
-	elif [ -z "$mode" ] || [ "$mode" = prog ]; then
+	;;
+	test-prog)
+		go test -c $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
+	;;
+	""|prog)
 		go build $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
-	else
+	;;
+	*)
 		# go build links an executable to extract the symbols. If this is a plugin there'll be
 		# unresolved symbols. Ignore now, handle in final link.
 		CGO_LDFLAGS="-Wl,--unresolved-symbols=ignore-in-object-files $CGO_LDFLAGS"
@@ -120,7 +126,7 @@ else
 		fi
 		# If there weren't any exports the header won't be created, but we expected it to be there.
 		touch "${OUT%.a}.h"
-	fi
-fi
+	;;
+esac
 
 ( echo -n "$OUT: " ; go list -f "${PKG:-.}"' {{range .Deps}}{{.}} {{end}}' $PKG | xargs go list -f '{{$dir:=.Dir}}{{range .GoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CgoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .HFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .TestGoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}' ) | tr "\n" " " > "$depfile" || exit 1

@@ -75,11 +75,12 @@ func (desc *GeneralDesc) AddTarget(tname, rule string, srcs []string, destdir, s
 		}
 	}
 
+	eas := append([]string(nil), extraargs...)
 	target := &Target{
 		Rule:          rule,
 		Sources:       srcs,
 		Srcopts:       srcopts,
-		Extraargs:     extraargs,
+		Extraargs:     eas,
 		Destdir:       destdir,
 		Options:       options,
 		IncdepsExcept: make(map[string]bool),

@@ -402,14 +402,18 @@ invars.sh.
     GOTEST(foo
     )
 
-Add this descriptor to the same Buildesc as GOPROG and any other go packages
-where you wish to use ninja to run `go test`. The advantage of using ninja here
-is that it adds include paths etc. for cgo tests that can otherwise be difficult
-to figure out.
+Uses go test -c to produce a binary called foo.test that's by default installed
+to the /gotest destination directory. This binary can be executed to run the
+tests, but do note that some go unit tests might assume that they're run from a
+specific directory or have other expectations.
 
-These tests aren't built by the default ninja run, for each GOTEST descriptor a
-target `build/flavor/gotest/name` is created which you can give to ninja to run
-the test. In addition, you can also run `go test -cover` to generat an html file
+In addition, you can also run the go tests directly via ninja. The advantage of
+using ninja here to run go test is that it adds include paths etc. for cgo
+tests that can otherwise be difficult to figure out.
+
+To allow to run go test via ninja, for each GOTEST descriptor a target
+`build/flavor/gotest/name` is created which you can give to ninja to run the
+test. In addition, you can also run `go test -cover` to generat an html file
 with this target:
 
     build/<flavor>/gocover/<name>-coverage.html

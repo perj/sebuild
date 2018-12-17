@@ -14,6 +14,7 @@ grep -q bar $BUILDPATH/obj/regress/lib/test
 
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gotest/gopath
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html
+env GOPATH=$PWD/go $BUILDPATH/regress/gotest/gopath.test
 
 # This sleep is unfortunately necessary because ninja doesn't
 # recognize timestamp differences smaller than one second.
