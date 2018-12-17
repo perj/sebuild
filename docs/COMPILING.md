@@ -151,6 +151,9 @@ a target to rebuild the ninja files (with proper dependencies) and finally
 includes the flavors we'll build.  The default flavor is `dev`. A flavor is
 simply a named configuration, think 'dev' and 'release'.
 
+As a convenience, near the top it contains a comment with enabled flavors and
+conditions, allowing you to check that they match your expectations.
+
 The obj directory also contains a subdirectory for each flavor. In there the
 ninja files and intermediate build files are kept. More about that below.
 
