@@ -26,3 +26,8 @@ FOO(disabled
 	enabled:badflavor[]
 	foos[foo.foo]
 )
+
+INSTALL(/regress/infile
+	conf[infile]
+	srcs[infile.in]
+)

@@ -14,6 +14,7 @@ grep '# Conditions:.*cbar, .*cbaz, .*cfoo' $BUILDPATH/build.ninja
 grep -q gopath $BUILDPATH/regress/collect_test/hejsan.txt
 grep -q gopath $BUILDPATH/regress/collect_test/other.txt
 grep -q bar $BUILDPATH/obj/regress/lib/test
+grep -q fooval $BUILDPATH/regress/regress/infile/infile
 
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gotest/gopath
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html

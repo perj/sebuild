@@ -2,3 +2,4 @@
 
 scmcoord_contrib=/opt/scmcoord_contrib
 gopath=go:$scmcoord_contrib/go
+inconfig=scripts/invars.sh
