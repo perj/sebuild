@@ -130,6 +130,14 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	// Using bufio.Writer allows us to skip error checking until Flush.
 	w := bufio.NewWriter(topfile)
 
+	fmt.Fprintf(w, "# Flavors: %s\n", strings.Join(ops.Config.ActiveFlavors, ", "))
+	conds := make([]string, 0, len(ops.Config.Conditions))
+	for c := range ops.Config.Conditions {
+		conds = append(conds, c)
+	}
+	sort.Strings(conds)
+	fmt.Fprintf(w, "# Conditions: %s\n", strings.Join(conds, ", "))
+
 	// While we usually use $buildpath to refer to the top path
 	// ninja treats $builddir specially so set it as well.
 	fmt.Fprintf(w, "builddir=%s\n", toppath)

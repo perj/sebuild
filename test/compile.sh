@@ -8,6 +8,9 @@ CC='env cc' seb -condition cfoo -condition cbar
 touch Builddesc # to make ninja invoke seb.
 ninja -f $BUILDPATH/build.ninja
 
+grep '# Flavors: regress' $BUILDPATH/build.ninja
+grep '# Conditions:.*cbar, .*cbaz, .*cfoo' $BUILDPATH/build.ninja
+
 grep -q gopath $BUILDPATH/regress/collect_test/hejsan.txt
 grep -q gopath $BUILDPATH/regress/collect_test/other.txt
 grep -q bar $BUILDPATH/obj/regress/lib/test
