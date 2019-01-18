@@ -117,7 +117,9 @@ case "$mode" in
 	*)
 		# go build links an executable to extract the symbols. If this is a plugin there'll be
 		# unresolved symbols. Ignore now, handle in final link.
-		CGO_LDFLAGS="-Wl,--unresolved-symbols=ignore-in-object-files $CGO_LDFLAGS"
+		if [ "$(go env GOOS)" != darwin ]; then
+			CGO_LDFLAGS="-Wl,--unresolved-symbols=ignore-in-object-files $CGO_LDFLAGS"
+		fi
 		if [ "$mode" = "piclib" ]; then
 			# -a to build standard libs with -shared
 			go build $BUILDFLAGS -buildmode=c-archive -gcflags='-shared' -asmflags='-shared' -a -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
@@ -126,6 +128,12 @@ case "$mode" in
 		fi
 		# If there weren't any exports the header won't be created, but we expected it to be there.
 		touch "${OUT%.a}.h"
+
+		if [ "$(go env GOOS)" != darwin ]; then
+			# Try to disable auto-start of go runtime. We want to be able to fork.
+			# Don't know how to do it on Darwin right now.
+			objcopy --rename-section .init_array=go_init --globalize-symbol="_rt0_$(go env GOARCH)_$(go env GOOS)_lib" "$out"
+		fi
 	;;
 esac
 

@@ -125,7 +125,7 @@ rule gobuild
     pool = gobuilds
 
 rule gobuildlib
-    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir" && objcopy --rename-section .init_array=go_init --globalize-symbol=_rt0_`go env GOARCH`_`go env GOOS`_lib "$out"
+    command = GOPATH="$gopath" $buildtooldir/internal/tools/gobuild.sh "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
     depfile = $depfile
     description = building go library $out from $in
     pool = gobuilds
