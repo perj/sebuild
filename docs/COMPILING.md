@@ -905,6 +905,10 @@ Finally they can also be added by the config script, see the separate section.
 Conditions can use letters, numbers and underscore (`_`), no other characters
 are allowed.
 
+A special condition is `nocgo`. If used, the environment variable `CGO_ENABLED`
+will be set to 0. The check is done in the other direction as well, using either
+sets both. This is to sync seb generation with go build invocation.
+
 ## Various special rules and definition files ##
 
 ### build_version.h ###

@@ -9,8 +9,10 @@ package main
 //go:generate go-bindata -nomemcopy -ignore Builddesc -prefix ../../ ../../internal/... ../../rules/...
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -34,6 +36,17 @@ func (s SetFlag) String() string {
 	return strings.Join(keys, ", ")
 }
 
+type ArrayFlag []string
+
+func (a *ArrayFlag) Set(v string) error {
+	*a = append(*a, v)
+	return nil
+}
+
+func (a *ArrayFlag) String() string {
+	return strings.Join(*a, ", ")
+}
+
 var (
 	noexec  bool
 	install bool
@@ -50,12 +63,13 @@ func main() {
 	}
 	flag.BoolVar(&ops.Options.Debug, "debug", false, "Enable debug output")
 	flag.BoolVar(&ops.Options.Quiet, "quiet", false, "Silence default output")
-	flag.Var(SetFlag(ops.Options.WithFlavors), "with-flavor", "Only generate this flavor (can be used multiple times). Usually not needed as each flavor is also a ninja pseudo-target.")
-	flag.Var(SetFlag(ops.Options.WithoutFlavors), "without-flavor", "Don't generate this flavor (can be used multiple times)")
-	flag.Var(SetFlag(ops.Config.Conditions), "condition", "Add build condition (can be used multiple times)")
+	flag.Var(SetFlag(ops.Options.WithFlavors), "with-flavor", "Only generate this flavor. Can be used multiple times. Usually not needed as each flavor is also a ninja pseudo-target.")
+	flag.Var(SetFlag(ops.Options.WithoutFlavors), "without-flavor", "Don't generate this flavor. Can be used multiple times.")
+	flag.Var(SetFlag(ops.Config.Conditions), "condition", "Add build condition. Can be used multiple times.")
 	flag.BoolVar(&noexec, "noexec", false, "Don't execute ninja")
 	flag.BoolVar(&install, "install", false, "Install ninja runtime into $HOME/.seb/")
 	flag.StringVar(&topdir, "topdir", "", "Set top directory manually instead of scanning for Builddesc.top")
+	flag.Var((*ArrayFlag)(&ops.Config.Configvars), "configvars", "Add a configvars file. These are read before configvars files in CONFIG. Can be used multiple times.")
 	flag.Parse()
 
 	if install {
@@ -85,13 +99,34 @@ func main() {
 
 	if !noexec && os.Getenv("BUILD_BUILD_FROM_NINJA") == "" {
 		ops.PostConfigFunc = func(ops *buildbuild.GlobalOps) error {
+			// Either nocgo condition or CGO_ENABLED=0 env sets both of them.
+			if ops.Config.Conditions["nocgo"] {
+				os.Setenv("CGO_ENABLED", "0")
+			} else if os.Getenv("CGO_ENABLED") == "0" {
+				ops.Config.Conditions["nocgo"] = true
+			}
+
 			bnpath := filepath.Join(ops.Config.Buildpath, "build.ninja")
-			_, err := os.Stat(bnpath)
+			f, err := os.Open(bnpath)
 			if err != nil {
 				return nil
 			}
-			// build.ninja already exists. Let's just exec ninja and let it
-			// re-invoke us if needed.
+			// build.ninja already exists. If the header match then
+			// we just exec ninja and let it re-invoke us if needed.
+			// If we get any errors here try the long path.
+			defer f.Close()
+			ours := []byte(fmt.Sprintf("# %s\n", buildbuild.BuildBuildArgs(os.Args)))
+			theirs := make([]byte, len(ours))
+			if _, err := io.ReadFull(f, theirs); err != nil {
+				return nil
+			}
+			if !bytes.Equal(ours, theirs) {
+				if ops.Options.Debug {
+					fmt.Fprintf(os.Stderr, "ninja.build arguments mismatch, `%s' != `%s'\n", ours, theirs)
+				}
+				return nil
+			}
+
 			ninja, err := FindNinja()
 			if err != nil {
 				return nil
