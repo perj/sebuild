@@ -99,6 +99,13 @@ func main() {
 
 	if !noexec && os.Getenv("BUILD_BUILD_FROM_NINJA") == "" {
 		ops.PostConfigFunc = func(ops *buildbuild.GlobalOps) error {
+			// Either nocgo condition or CGO_ENABLED=0 env sets both of them.
+			if ops.Config.Conditions["nocgo"] {
+				os.Setenv("CGO_ENABLED", "0")
+			} else if os.Getenv("CGO_ENABLED") == "0" {
+				ops.Config.Conditions["nocgo"] = true
+			}
+
 			bnpath := filepath.Join(ops.Config.Buildpath, "build.ninja")
 			f, err := os.Open(bnpath)
 			if err != nil {
