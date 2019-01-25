@@ -100,12 +100,26 @@ func main() {
 	if !noexec && os.Getenv("BUILD_BUILD_FROM_NINJA") == "" {
 		ops.PostConfigFunc = func(ops *buildbuild.GlobalOps) error {
 			bnpath := filepath.Join(ops.Config.Buildpath, "build.ninja")
-			_, err := os.Stat(bnpath)
+			f, err := os.Open(bnpath)
 			if err != nil {
 				return nil
 			}
-			// build.ninja already exists. Let's just exec ninja and let it
-			// re-invoke us if needed.
+			// build.ninja already exists. If the header match then
+			// we just exec ninja and let it re-invoke us if needed.
+			// If we get any errors here try the long path.
+			defer f.Close()
+			ours := []byte(fmt.Sprintf("# %s\n", buildbuild.BuildBuildArgs(os.Args)))
+			theirs := make([]byte, len(ours))
+			if _, err := io.ReadFull(f, theirs); err != nil {
+				return nil
+			}
+			if !bytes.Equal(ours, theirs) {
+				if ops.Options.Debug {
+					fmt.Fprintf(os.Stderr, "ninja.build arguments mismatch, `%s' != `%s'\n", ours, theirs)
+				}
+				return nil
+			}
+
 			ninja, err := FindNinja()
 			if err != nil {
 				return nil

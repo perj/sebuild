@@ -109,6 +109,18 @@ func (ops *GlobalOps) StatRulePath(pth string) bool {
 	return err == nil
 }
 
+// Strips args of anything after -- and returns it joined.
+// In the future might remove some arguments before -- as well.
+func BuildBuildArgs(args []string) string {
+	for idx, arg := range args {
+		if arg == "--" {
+			args = args[:idx]
+			break
+		}
+	}
+	return strings.Join(args, " ")
+}
+
 func (ops *GlobalOps) OutputTop() (err error) {
 	toppath := ops.Config.Buildpath
 	mkpath(toppath)
@@ -130,6 +142,7 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	// Using bufio.Writer allows us to skip error checking until Flush.
 	w := bufio.NewWriter(topfile)
 
+	fmt.Fprintf(w, "# %s\n", BuildBuildArgs(os.Args))
 	fmt.Fprintf(w, "# Flavors: %s\n", strings.Join(ops.Config.ActiveFlavors, ", "))
 	conds := make([]string, 0, len(ops.Config.Conditions))
 	for c := range ops.Config.Conditions {
@@ -154,7 +167,7 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	fmt.Fprintf(w, "gobuild_test_flags=$$GOBUILD_TEST_FLAGS\n")
 	fmt.Fprintf(w, "cgo_enabled=$$CGO_ENABLED\n")
 
-	fmt.Fprintf(w, "build_build = %s\n", strings.Join(os.Args, " "))
+	fmt.Fprintf(w, "build_build = %s\n", BuildBuildArgs(os.Args))
 	fmt.Fprintf(w, "buildtooldir=%s\n", ops.BuildtoolDir())
 	fmt.Fprintf(w, "inconfig = $buildtooldir/scripts/invars.sh\n")
 	cv := strings.TrimSpace(strings.Join(ops.Config.Configvars, " "))
