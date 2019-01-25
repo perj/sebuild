@@ -9,8 +9,10 @@ package main
 //go:generate go-bindata -nomemcopy -ignore Builddesc -prefix ../../ ../../internal/... ../../rules/...
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -34,6 +36,17 @@ func (s SetFlag) String() string {
 	return strings.Join(keys, ", ")
 }
 
+type ArrayFlag []string
+
+func (a *ArrayFlag) Set(v string) error {
+	*a = append(*a, v)
+	return nil
+}
+
+func (a *ArrayFlag) String() string {
+	return strings.Join(*a, ", ")
+}
+
 var (
 	noexec  bool
 	install bool
@@ -50,12 +63,13 @@ func main() {
 	}
 	flag.BoolVar(&ops.Options.Debug, "debug", false, "Enable debug output")
 	flag.BoolVar(&ops.Options.Quiet, "quiet", false, "Silence default output")
-	flag.Var(SetFlag(ops.Options.WithFlavors), "with-flavor", "Only generate this flavor (can be used multiple times). Usually not needed as each flavor is also a ninja pseudo-target.")
-	flag.Var(SetFlag(ops.Options.WithoutFlavors), "without-flavor", "Don't generate this flavor (can be used multiple times)")
-	flag.Var(SetFlag(ops.Config.Conditions), "condition", "Add build condition (can be used multiple times)")
+	flag.Var(SetFlag(ops.Options.WithFlavors), "with-flavor", "Only generate this flavor. Can be used multiple times. Usually not needed as each flavor is also a ninja pseudo-target.")
+	flag.Var(SetFlag(ops.Options.WithoutFlavors), "without-flavor", "Don't generate this flavor. Can be used multiple times.")
+	flag.Var(SetFlag(ops.Config.Conditions), "condition", "Add build condition. Can be used multiple times.")
 	flag.BoolVar(&noexec, "noexec", false, "Don't execute ninja")
 	flag.BoolVar(&install, "install", false, "Install ninja runtime into $HOME/.seb/")
 	flag.StringVar(&topdir, "topdir", "", "Set top directory manually instead of scanning for Builddesc.top")
+	flag.Var((*ArrayFlag)(&ops.Config.Configvars), "configvars", "Add a configvars file. These are read before configvars files in CONFIG. Can be used multiple times.")
 	flag.Parse()
 
 	if install {
