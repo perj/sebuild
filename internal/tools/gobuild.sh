@@ -73,15 +73,15 @@ if [ -z "$mode" ]; then
 	mode="prog"
 fi
 
-BUILDFLAGS="-i -pkgdir $(cd "$pkgdir" ; pwd)/gopkg_$mode -installsuffix=$mode"
+BUILDFLAGS="-i -pkgdir $(cd "$pkgdir" ; pwd)/gopkg_$mode -installsuffix=$mode $GOBUILD_FLAGS"
 
 if [ "$mode" = "test" ]; then
 	[ -z "$PKG" ] && cd "$ABSIN"
-	exec go test $GOBUILD_TEST_FLAGS $PKG
+	exec go test $GOBUILD_FLAGS $GOBUILD_TEST_FLAGS $PKG
 fi
 if [ "$mode" = "bench" ]; then
 	[ -z "$PKG" ] && cd "$ABSIN"
-	exec go test $PKG -bench $4
+	exec go test $GOBUILD_FLAGS $GOBUILD_TEST_FLAGS $PKG -bench $4
 fi
 if [ "$mode" = "cover_html" ]; then
 	# If we have a GOPATH then disable go modules or go 1.11 might fail

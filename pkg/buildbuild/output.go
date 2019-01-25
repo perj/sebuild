@@ -144,7 +144,16 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	fmt.Fprintf(w, "buildpath=%s\n", toppath)
 	fmt.Fprintf(w, "cc=%s\n", ops.CC)
 	fmt.Fprintf(w, "cxx=%s\n", ops.CXX)
+
+	// Copy some environment variables, then allow configvars ninja files
+	// to override them. The reason to do it this way is that dependencies
+	// don't work with environment variables. Changing a configvars file
+	// does trigger rebuilds properly.
 	fmt.Fprintf(w, "gopath=$$GOPATH\n")
+	fmt.Fprintf(w, "gobuild_flags=$$GOBUILD_FLAGS\n")
+	fmt.Fprintf(w, "gobuild_test_flags=$$GOBUILD_TEST_FLAGS\n")
+	fmt.Fprintf(w, "cgo_enabled=$$CGO_ENABLED\n")
+
 	fmt.Fprintf(w, "build_build = %s\n", strings.Join(os.Args, " "))
 	fmt.Fprintf(w, "buildtooldir=%s\n", ops.BuildtoolDir())
 	fmt.Fprintf(w, "inconfig = $buildtooldir/scripts/invars.sh\n")
