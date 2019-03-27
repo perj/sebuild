@@ -5,12 +5,15 @@ typical configuration will build 'dev' and 'release' versions of the code.
 
 There are three ways the flavors can be differentiated between each other.
 
-### .in flavors ###
+## In-file flavors
 
-The typical way to generate the variables for .in files is to allow the script
-that generates the input to include the file with various build variables
-defined. These will be defined inside `build/obj/<flavor>/buildvars.ninja` and
-include definitions for the flavor being built and various directories.
+The [srcs arguments](arguments/srcs.md) allow you to generate files by
+simply replacing some variables. These variables or entire portions of the
+in file can be flavor specific.
+
+Sebuild runs a script to generate the variables for the in-files. This
+script include the `build/obj/<flavor>/buildvars.ninja` file which
+contain various flavor specific settings.
 
 ### COMPONENT flavors ###
 
@@ -37,8 +40,3 @@ name after. Like this:
 
 The result will be a merge between the unflavored arguments and the arguments
 for this flavor (`srcs[a.c b.c c.c]` in the example).
-
-### flavors argument ###
-
-All build descriptors (except `CONFIG`) also support a `flavors` argument. This
-argument lists the flavors where that build descriptor applies.

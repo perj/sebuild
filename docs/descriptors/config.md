@@ -8,10 +8,11 @@ Sebuild is meant to have sane defaults and perhaps you will not need a
 CONFIG directive at all, its entire contents is optional. The most common
 options to add are `configvars`, `config_script` and `flavors`.
 
-To configure what's being built and how you will need something like this:
+A config directive with full contents will look something like this.
 
 	CONFIG(
 		buildversion_script[sebuild/buildversion.sh]
+		compiler[gcc]
 		flavors[dev release]
 		configvars[
 			sebuild/config.ninja
@@ -35,12 +36,14 @@ To configure what's being built and how you will need something like this:
 		]
 	)
 
-This configures some aspects of the build system.
+CONFIG contains custom arguments, described here. The list of arguments
+on the index page does not apply to CONFIG. As a special exception, you _can_
+use the [INCLUDE argument](../arguments/include.md) in CONFIG.
 
 ## `buildversion_script`
-Script that outputs one number which is the version
-of what's being built. It's highly recommended that the version number is
-unique for at least every commit to your repository.
+Script that outputs one number which is the version of what's being built. It's
+highly recommended that the version number is unique for at least every commit
+to your repository.
 Defaults to `git rev-list HEAD 2>/dev/null|wc -l|xargs` (xargs remove
 any formatting wc adds.)
 
@@ -58,17 +61,22 @@ Defaults to `dev` only.
 
 ## `configvars`
 A list of file names, relative paths.
-The files should contain global ninja variables. This caan be used to set some
+
+The files should contain global ninja variables. This can be used to set some
 ninja variables such as the default gopath. Passed to invars.sh to also
-generate variables there, must thus contain only variable assignments.
+generate variables there, must thus contain only variable assignments, no
+rules.
 
 ## `rules`
 A list of file names, relative paths.
+
 Global compilation rules. These ninja files gets included globally.
 Defaults to empty list. The rules.ninja bundled with sebuild is however always
 included as well, regardless of this value.
 
 ## `extravars`
+A list of file names, relative paths.
+
 Per flavor-included ninja files. This means they can depend on the variables
 defined in the flavor files. Can be flavored.
 

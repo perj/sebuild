@@ -1,7 +1,5 @@
 # Writing Builddesc files
 
-## General syntax
-
 A Builddesc file contains one or more build descriptors, and maybe some
 comments. Example:
 
@@ -23,16 +21,16 @@ Build descriptors have the general form of:
     DESC(name argument1[element1 element2 element3] argument2[el])
 
 `DESC` is the descriptor, for example: `CONFIG`, `COMPONENT`, `PROG`,
-`TOOL_PROG`, `LIB`, `MODULE`, `INSTALL`, `TOOL_INSTALL`. These will be
-described later on. There are a few more descriptors than these and plugins can
-also add more descriptors.
+`TOOL_PROG`, `LIB`, `MODULE`, `INSTALL`, `TOOL_INSTALL`.
+There are a few more descriptors than these and plugins can also add more
+descriptors.
 
 All descriptors except `COMPONENT` and `CONFIG` require a name and at least one
 argument. Name and arguments are separated by spaces.
 
 Arguments are usually lists of elements. The elements are separated by
-whitespace. Some arguments can only contain one element, it will become obvious
-later in the documentation which ones those are. Arguments are things like:
-srcs, includes, libs, deps, etc.
+whitespace. Some arguments can only contain one element, this is clarified
+in the argument documentation. Arguments are things like: srcs, includes, libs,
+deps, etc.
 
-Descriptors and arguments are listed on the main [index](index.md) page.
+Descriptors and arguments are listed on the main [index](README.md) page.

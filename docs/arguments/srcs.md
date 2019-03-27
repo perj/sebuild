@@ -3,15 +3,45 @@
     srcs[foo.c bar.cc]
 
 Source files to build a program, library, module, tool or configuration file.
-Seb automatically knows what to do with the following extensions:
+Sebuild automatically knows what to do with the following extensions:
 
 * c - C source
 * cc, cxx - C++ source
 * go - Go source
-* gperf.enum - enumerated gperf source
-* in - to be processed by in.pl
+* gperf - gperf source.
+* gperf.enum - enumerated gperf source.
+* in - to be processed as an in-file.
 * ll - C++ lex
 * yy - C++ yacc
+
+Additional extensions can be added by plugins. Failing that
+[specialsrcs](specialsrcs.md) can be used instead to manually specify what rule
+compiles the source and what it generates.
+
+The sources generate intermediate files that are put in the build/obj/ directory
+matching the source path and flavor. They are further added again to be part
+of the final product, unless anything else is noted below.
+
+## C and C++ Sources
+
+This are compiled into object files, replacing the `c`, `cc` or `cxx` extension
+with `o`. Those are further linked into the final product.
+
+## In Sources
+
+Also called in-files. A special script is run on these, using the
+`build/obj/flavor/tools/in.conf` file to replace `%VARIABLE%` with the value of
+`VARIABLE` from that file. It's an error to have undefined variables in the
+in-files. To generate a `%` character use `%%`.
+
+Entire sections can also be enable/disabled based on the current flavor.
+Text between `%FLAVOR_START%` and `%FLAVOR_END%` marker lines are removed
+unless FLAVOR matches the uppercased version of the current flavore. All
+markers are also removed.
+
+The generate file has the same file name but with `.in` removed. This file
+is NOT further processed but can be used e.g. in a [conf](conf.md) or
+[scripts](scripts.md) argument.
 
 ## Go Sources
 
@@ -38,3 +68,21 @@ taking argc, argv and environ:
 
 (this disabling the autostart of Go runtime should probably not be enabled by
 default.)
+
+## Gperf Sources
+
+These are compiled with gperf to generate header files. The flag `-L ANSI-C`
+is added but furter options should be put in the gperf file itself. The generated
+file has the gperf extension removed and .h added.
+
+## Gperf Enum Sources
+
+No longer really needed, as an improved [specialsrcs](specialsrcs.md) is available,
+but these can still be used to generate a Gperf header file that match on the strings
+contained in this file. It's suggested to inspect the generated header to see how
+these works. The generated file has the .gperf.enum extension removed and .h added.
+
+## Flex and yacc Sources
+
+The extensions `.ll` and `.yy` are passed to flex and bison respectively. They
+will be given flags to generate C++ code.

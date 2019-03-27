@@ -24,10 +24,12 @@ Conditions can also be added in `CONFIG` like so:
 adds conditions a and b. They can also be passed on the command line, running
 `seb -cond foo` adds the condition `foo`.
 
-Finally they can also be added by the config script, see the separate section.
+Finally they can also be added by the [config script](descriptors/config.md#config_script).
 
 Conditions can use letters, numbers and underscore (`_`), no other characters
 are allowed.
+
+## nocgo condition
 
 A special condition is `nocgo`. If used, the environment variable `CGO_ENABLED`
 will be set to 0. The check is done in the other direction as well, using either

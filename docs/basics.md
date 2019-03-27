@@ -9,7 +9,7 @@ software projects out there called 'ninja'.
 If this document gets out of date, the tools we have are made roughly around
 the time of ninja 1.0, and known to work up to ninja 1.8.
 
-## How to run
+## How To Run
 
 The basic way to build a tree is simply to invoke `seb`.
 
@@ -36,3 +36,10 @@ If you're not sure if you changed anything, you can still recompile and see
 what happens. An empty compilation of the platform code is 100ms. Since seb
 finds the top directory you should be able to run it from anywhere within the
 tree.
+
+## Where is the Output
+
+The finished product files that seb produce are by default located in the
+`build/dev/` folder. This can however be customized by both environment
+variables and `Builddesc` config settings. But without those the command
+`find build/dev/` should give you a nice output of what's been created.

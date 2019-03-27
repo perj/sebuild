@@ -3,10 +3,10 @@
 ## What to build
 
 Components of the system are described by Builddesc files. Those files get
-parsed by the `seb` program and translated into ninja files. Seb does most of
-the heavy lifting for figuring out dependencies.
+parsed by the `seb` program and translated into ninja files. Sebuild does most
+of the heavy lifting for figuring out dependencies.
 
-## Dependencies ##
+## Dependencies
 
 The important thing to understand about the build system is that everything
 must have proper dependencies. You can't get away with knowing that Make will
@@ -25,7 +25,7 @@ advantages.
 How to express dependencies is described in the documentation of how to write
 `Builddesc` files.
 
-## Libraries ##
+## Libraries
 
 Most dependencies on generic components are expressed through libraries. If a
 source file is used by multiple binaries, it needs to end up in a library. This
@@ -35,7 +35,7 @@ shouldn't be much size or performance overhead. But one thing this means is
 that you can't have defines controlling certain behaviors of the build. It is
 often trivial to fix the existing defines, so it shouldn't much of a problem.
 
-## Build directory ##
+## Build directory
 
 Everything during the build is contained into the build/ directory at top of
 the tree, or wherever you wish by setting the `BUILDPATH` environment variable.
@@ -61,7 +61,7 @@ The obj directory also contains a subdirectory for each flavor. In there the
 ninja files and intermediate build files are kept. More about that below.
 
     $ ls build/dev/
-    bin  include modules regress
+    bin  modules regress
     $
 
 This is the destination directory for the dev flavor. The goal here is

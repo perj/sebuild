@@ -54,4 +54,5 @@ files refer to COMPILING.md.
 
 ## SEE ALSO
 
-COMPILING.md
+There should be an extensive set of markdown documentation files bundled with
+this tool. They're also available at `https://schibstd.github.io/sebuild`.

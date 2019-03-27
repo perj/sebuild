@@ -62,6 +62,10 @@ build/obj/flavor directory.
 
 ### Descriptor Arguments
 
+These arguments apply to all descriptors except CONFIG and COMPONENT.
+If an argument only applies to one or some desciptors (again except CONFIG and
+COMPONENT), that is noted specially.
+
 * [Including Builddesc fragments - INCLUDE](arguments/include.md)
 * [Enabling Descriptors - enabled](arguments/enabled.md)
 * [Limiting a Descriptor to Certain Flavors - flavors](arguments/flavors.md)
