@@ -7,5 +7,9 @@
      )
     
 `MODULE` describes how to build various shared object modules. Those end up in
-modules/. php, perl and apache modules are all built the same way. All modules
+modules/. Php, perl and apache modules are all built the same way. All modules
 are added to the default build target.
+
+The MODULE descriptor is fairly similar to [PROG](prog.md) in that it creates
+a binary in the destination directory. The main difference is the kind of
+binary created.

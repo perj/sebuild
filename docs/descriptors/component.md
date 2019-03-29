@@ -17,7 +17,7 @@ contain a Builddesc with `COMPONENT` in it, but be very careful with that. It's
 much more transparent and readable to have a long list of everything built
 instead of a magic tree where everything is hidden.
 
-The only other argumnet for `COMPONENT` build descriptors is `flavors`. See
-flavors documentation below for the semantics of that. If `flavors` is omitted,
-the components will be included in all flavors.
+The only other argumnet for `COMPONENT` build descriptors is `flavors`. See the
+[flavors documentation](../arguments/flavors.md) for the semantics of that. If
+`flavors` is omitted, the components will be included in all flavors.
 

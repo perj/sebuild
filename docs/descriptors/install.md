@@ -11,13 +11,42 @@
      )
     
 Installs files into the destination directory specified in the name. There are
-different installation arguments, "scripts" specifies executable scripts and
-such, "conf" specifies non-executable files, "python" should only be used for
-python scripts (they will be compiled after install). A thing worth noting is
-that you can specify files that are copied straight from the source directory
-and also configuration files that have been compiled somehow (like .in).  Seb
-will figure out which source file is built where and where to copy it from.
+different installation arguments described below.
 
+A thing worth noting is that you can specify files that are copied straight
+from the source directory and also configuration files that have been compiled
+somehow (like .in). Sebuild will figure out which source file is built where
+and where to copy it from.
+
+## Arguments
+
+### conf
+
+    conf[some.conf]
+
+Any kind of generic non-executable file, e.g. configuration files.
+
+### scripts
+
+    scripts[index_ctl]
+
+Specifies executable shell scripts and such. Used to set the executable flag.
+
+### php
+
+    php[random.php]
+
+PHP code to be installed and syntax checked using the PHP lint command.
+Only valid in the INSTALL descriptor.
+
+### python
+
+    python[random.py]
+
+Installs the python script but also compiles it, which produces .pyc and .pyo
+files as well as checking the file syntax.
+
+### symlink
 Symlinks can also be created, using this syntax:
 
 	INSTALL(/dir

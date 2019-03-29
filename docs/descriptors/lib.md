@@ -8,18 +8,21 @@
 
 `LIB` describes how to build a library. Libraries end up in obj/flavor/lib/ and
 are only built when something links with them. An interesting thing to note
-here is that `seb` generates targets for normal and PIC targets for all shared
-libraries and the PIC targets get only built for the libraries that get linked
-into modules.
+here is that Sebuild generates targets for normal and PIC targets for all
+shared libraries and the PIC targets get only built for the libraries that get
+linked into modules.
 
 `LINKERSET_LIB` is similar to lib. Instead of creating a normal library
 however, it creates a partial linked object file.  This has the effect of
 including all the symbols in the final binary, instead of only the referenced
 ones, which is required to access otherwise unreferences linkerset entries.
 
-`includes` and `libs` are valid parameters here. The includes argument
+## Arguments
+
+`includes` and `libs` are valid arguments here. The includes argument
 specifies which include files are the external interface for this library and
-those get installed in obj/flavor/includes/. The libs argument is special.
+those get installed in obj/flavor/includes/. The libs argument works like
+elsewhere, but internally it's a bit special.
 Since we're building a static library, it can't be linked with other libraries
 (unless they are static, but there's madness there). Instead `libs` create
 dependencies that make programs built with this library to also link with those

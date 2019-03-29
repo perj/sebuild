@@ -64,7 +64,7 @@ build/obj/flavor directory.
 
 These arguments apply to all descriptors except CONFIG and COMPONENT.
 If an argument only applies to one or some desciptors (again except CONFIG and
-COMPONENT), that is noted specially.
+COMPONENT), that is noted specifically.
 
 * [Including Builddesc fragments - INCLUDE](arguments/include.md)
 * [Enabling Descriptors - enabled](arguments/enabled.md)
@@ -80,7 +80,8 @@ COMPONENT), that is noted specially.
 * [Changing the Destination Directory - destdir](arguments/destdir.md)
 * [Collecting Targets in a Variable - collect_target_var](arguments/collect-target-var.md)
 * [Linker Specific Arguments - cflags, cwarnflags, conlyflags, cxxflags, copts, ldopts](arguments/linker-args.md)
-* [Install Specific Arguments - conf, scripts, php](arguments/install-args.md)
+* [Install Specific Arguments - conf, scripts, php, python, symlink](descriptors/install.md#arguments)
+* [Library Specific Arguments - includes, libs, incprefix](descriptors/lib#arguments)
 
 ### Customizing sebuild
 
@@ -88,7 +89,8 @@ COMPONENT), that is noted specially.
   tools in custom locations.
 * [Custom Rules](custom-rules.md) describe how to add more rules that can be
   used in specialsrcs arguments.
-* Information about plugins should be added here.
+* [Plugins](plugins.md) handles adding custom descriptors, arguments or
+  specialsrcs.
 
 ### Uncategorized Pages (to be moved)
 

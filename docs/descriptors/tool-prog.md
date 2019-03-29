@@ -7,6 +7,7 @@
              libs[platform_util]
      )
 
-`TOOL_PROG` is just like `PROG`, with two differences. Tools get installed
-under obj/flavor/tools/ and instead of like `PROG` - being part of the default
-build target tools get built only if something depends on them.
+`TOOL_PROG` is just like [PROG](prog.md), with two differences. Tools get
+installed under obj/flavor/tools/. Additionally they don't get compiled
+by default but only if something depends on them, e.g. via
+[ruledeps](config.md#ruledeps).

@@ -8,10 +8,13 @@ Sebuild is meant to have sane defaults and perhaps you will not need a
 CONFIG directive at all, its entire contents is optional. The most common
 options to add are `configvars`, `config_script` and `flavors`.
 
-A config directive with full contents will look something like this.
+A config directive with large contents will look something like this.
 
 	CONFIG(
+		buildpath[build]
+		buildvars[toolflags]
 		buildversion_script[sebuild/buildversion.sh]
+		conditions[x y]
 		compiler[gcc]
 		flavors[dev release]
 		configvars[
@@ -25,8 +28,6 @@ A config directive with full contents will look something like this.
 			scripts/build/toolrules.ninja
 			scripts/build/static.ninja
 		]
-		buildpath[build]
-		buildvars[toolflags]
 		ruledeps[
 			in:$inconf,$intool,$configvars
 		]
@@ -40,26 +41,74 @@ CONFIG contains custom arguments, described here. The list of arguments
 on the index page does not apply to CONFIG. As a special exception, you _can_
 use the [INCLUDE argument](../arguments/include.md) in CONFIG.
 
-## `buildversion_script`
+## buildpath
+Where the build files are put. See other sections of the documentation to see
+how files are organized.
+
+Defaults to the BUILDPATH environment variable or to `build` if unset.
+
+## buildvars
+Attributes in other build descriptors that are copied into ninja files as
+variables. The variable names here can be added as arguments in any descriptor
+and will be available to rules in your custom rules.ninja.
+
+## buildversion_script
 Script that outputs one number which is the version of what's being built. It's
 highly recommended that the version number is unique for at least every commit
 to your repository.
 Defaults to `git rev-list HEAD 2>/dev/null|wc -l|xargs` (xargs remove
 any formatting wc adds.)
 
-## `compiler`
+## compiler
 
 Override the compiler used, set it to the C compiler, C++ one will be guessed
 with some heuristics. Defaults to CC env variables or by testing a few common
 compilers if unset.
 
-## `flavors`
-Various build environments needed to build your site. The usual is to build dev
-and release.
+The available choices are gcc or clang:
 
-Defaults to `dev` only.
+	compiler[clang]
 
-## `configvars`
+You will need respective compiler to be installed, obviously.
+
+### compiler_flavor_rule_dir
+Directory for variables specific to both compiler and flavor, if any.
+Included mostly for completeness, works similar to
+[compiler_rule_dir](#compiler_rule_dir) and
+[flavor_rule_dir](#flavor_rule_dir).
+
+Defaults to the bundled `rules/compiler-flavor` directory which is empty.
+
+## compiler_rule_dir
+Directory containing variables for a compiler variant (such as gcc or clang).
+In this directory should be a file named `compiler.ninja` (e.g. gcc.ninja)
+that will be a global include based on compiler used. Typically sets the
+`warncompiler` ninja variable.
+
+Defaults to the bundled `rules/compiler` directory.
+
+## config_script
+Run a script whenever seb is generating ninja files and parse its output as
+variables or conditions.
+
+The script is run when seb is generating ninja files, and the output is parsed.
+Any line containing a equal sign (`=`) is added as a ninja variable. This can
+be used to e.g. run php-config only when seb is run instead of each call to the
+compiler. These variable can be referred to in cflags etc. by using `$var` as
+parsed by ninja.
+
+Any non-empty line output without an equal sign will be considered a condition
+to activate.
+
+Make sure to redirect any messages to stderr for them to appear on the console.
+
+## conditions
+Statically set the mentioned conditions. These are used to enable or disable
+features and are usually set via the script in [config_script](#config_script),
+but you can also set them here. Conditions are further described
+[here](../conditions.md).
+
+## configvars
 A list of file names, relative paths.
 
 The files should contain global ninja variables. This can be used to set some
@@ -67,31 +116,48 @@ ninja variables such as the default gopath. Passed to invars.sh to also
 generate variables there, must thus contain only variable assignments, no
 rules.
 
-## `rules`
-A list of file names, relative paths.
+Some descriptors and source types will parse some configvars values specially.
+These are mentioned in respective document.
 
-Global compilation rules. These ninja files gets included globally.
-Defaults to empty list. The rules.ninja bundled with sebuild is however always
-included as well, regardless of this value.
-
-## `extravars`
+## extravars
 A list of file names, relative paths.
 
 Per flavor-included ninja files. This means they can depend on the variables
 defined in the flavor files. Can be flavored.
 
-## `buildpath`
-Where the build files are put. See other sections of the documentation to see
-how files are organized.
+## flavors
 
-Defaults to the BUILDPATH environment variable or to `build` if unset.
+Unlike in other descriptor, here this argument lists all the available flavors.
+Flavors are described in more detail in [its own document](../flavors.md).
 
-## `buildvars`
-Attributes in other build descriptors that are copied into ninja files as
-variables. The variable names here can be added as arguments in any descriptor
-and will be available to rules in your custom rules.ninja.
+Defaults to `dev` only.
 
-### `ruledeps`
+## flavor_rule_dir
+Directory containing default variables for a flavor, in addition to those set
+here.
+In this directory should be a file named `flavor.ninja` (e.g. dev.ninja) that
+will be a flavor specific include. Typically sets variables such as `cflags`
+and `cwarnflags`.
+
+Defaults to the bundled `rules/flavor` directory.
+
+## godeps
+A list if files that all Go target depends on. E.g. you can add go.mod
+here to rebuild all go targets when go.mod changes.
+
+Empty list by default.
+
+## plugins
+A list of plugins to load. Plugins are go modules that can customize the
+desciptors and other parts of sebuild. See the [plugin
+documentation](../plugins.md) for more details.
+
+## prefix
+Set a prefix for the installed files for the specified flavor.
+This argument must be flavored, i.e. you have to use something like
+`prefix:release[usr/local]`, one entry per flavor.
+
+## ruledeps
 Per-rule dependencies. Targets built with a certain rule will depend on those
 additional target. In this example everything built with `in` will also depend
 on `$inconf` and `$intool`.
@@ -101,52 +167,9 @@ defaults are:
 
 * `in:$inconf,$intool,$configvars`
 
-### `prefix:flavor`
-Set a prefix for the installed files for the specified flavor.
-This argument must be flavored.
+## rules
+A list of file names, relative paths.
 
-### `config_script`
-Run a script whenever seb is generating ninja files and parse its output as
-variables or conditions.
-
-### `compiler_rule_dir`
-Directory containing variables for a compiler variant (such as gcc or clang).
-In this directory should be a file named `compiler.ninja` (e.g. gcc.ninja)
-that will be a global include based on compiler used. Typically sets the
-`warncompiler` ninja variable.
-
-Defaults to the bundled `rules/compiler` directory.
-
-### `flavor_rule_dir`
-Directory containing default variables for a flavor, in addition to those set
-here.
-In this directory should be a file named `flavor.ninja` (e.g. dev.ninja) that
-will be a flavor specific include. Typically sets variables such as `cflags`
-and `cwarnflags`.
-
-Defaults to the bundled `rules/flavor` directory.
-
-### `compiler_flavor_rule_dir`
-Directory for variables specific to both compiler and flavor, if any.
-Included mostly for completeness, works similar to the arguments above.
-
-Defaults to the bundled `rules/compiler-flavor` directory which is empty.
-
-## Config Script
-
-The script is run when seb is generating ninja files, and the output is parsed.
-Any line containing a equal sign (`=`) is added as a ninja variable. This can
-be used to e.g. run php-config only when seb is run instead of each call to the
-compiler.
-
-Any non-empty line output without an equal sign will be considered a condition
-to activate, conditions are described in more detail further down.
-
-## Compiler
-
-You can switch the compiler used in CONFIG. The available choices are gcc or
-clang:
-
-	compiler[clang]
-
-You will need respective compiler to be installed, obviously.
+Global compilation rules. These ninja files gets included globally.
+Defaults to empty list. The rules.ninja bundled with sebuild is however always
+included as well, regardless of this value.
