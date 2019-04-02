@@ -16,7 +16,19 @@ argument](../arguments/extravars.md).
 Additionally, setting the `nocgo` [condition](../conditions.md) disables cgo
 for all programs.
 
-## Ninja variables
+## Build some Other Package
+
+You can use GOPROG without having the go sources present in the same directory.
+If you use the `gopkg` argument that Go package will be compiled instead of the
+directory containing the Builddesc. If required, it will even be downloaded
+first, thus you can use any package available for download and install it
+to your local build.
+
+	gopkg[github.com/schibsted/sebuild/cmd/seb]
+
+The gopkg path used must name a `main` package.
+
+## Ninja Variables
 
 ### gopath
 Only needed for older Go versions, when not using Go modules.

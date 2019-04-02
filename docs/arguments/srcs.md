@@ -22,6 +22,11 @@ The sources generate intermediate files that are put in the build/obj/ directory
 matching the source path and flavor. They are further added again to be part
 of the final product, unless anything else is noted below.
 
+Most sources are only recognized in descriptors that use the linker, see
+[Linker Specific Arguments](linker-args.md).
+The main exception is the in extension which is often used in the
+[INSTALL](../descriptors/install.md) descriptor and elsewhere.
+
 ## C and C++ Sources
 
 These are compiled into object files, replacing the `c`, `cc` or `cxx` extension

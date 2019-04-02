@@ -35,9 +35,10 @@ and then use that variable. E.g.
 Then php-config isn't run for each compilation but only when generating the ninja
 files.
 
-## ldopts
+## no_analyse
 
-    ldopts[-fprofile-arcs]
+Disables the static analyser for this descriptor. Useful when it's made from
+third party sources and you won't modify it regardless. Use with an empty
+value.
 
-Options passed to linker. Does not override the default flags, but does
-override any ldopts set globally.
+    no_analyse[]

@@ -18,6 +18,13 @@ to set flags for one particular source file.
 
 ## Ninja Variables
 
+### cc
+Names the C compiler. Default value is decided based on the config
+directive and detected installed compilers.
+
+### cxx
+Names the C++ compiler. Default value is based on the cc variable.
+
 ### cflags
 Despite the name, this variable is used when compiling both C and C++ files.
 
@@ -47,7 +54,7 @@ Empty by default.
 
 ### ldopts
 Used when running the linker. Can for example contain additional -L flags.
-Empty by default and can be set globally despite the name.
+Empty by default and must be set globally despite the name.
 
 ### analyzer_flags
 Used when running the static analyzer. Can't be overridden in Builddesc but

@@ -15,6 +15,9 @@ Sources are only added if both conditions `linux` and `x86_64` are set.  Two
 conditions are always added: lowercase output of `uname` and output of `uname
 -m`. For example `linux` and `x86_64`.
 
+Condition checks can be negated by prefixing them with a bang (`!`). Then
+the check is successful if the condition is NOT set.
+
 Conditions can also be added in `CONFIG` like so:
 
 	CONFIG(

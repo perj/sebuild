@@ -65,7 +65,7 @@ meant to contain defines, e.g.
 
     cflags:release[-DNDEBUG]
 
-To set global clfags, use configvars. See also the
+To set global cflags, use configvars. See also the
 [Compiler and Linker Flags page](../compiler-flags.md).
 
 ## compiler
@@ -79,6 +79,13 @@ The available choices are gcc or clang:
 	compiler[clang]
 
 You will need respective compiler to be installed, obviously.
+
+You can add a version requirement and multiple options. For example
+
+	compiler[gcc:7.0 clang:5.0 gcc]
+
+will first look for gcc >= 7.0, then clang >= 5.0 and then fallback
+to an older version gcc.
 
 ### compiler_flavor_rule_dir
 Directory for variables specific to both compiler and flavor, if any.
@@ -167,7 +174,7 @@ this rule. In the future this requirement might be made optional.
 
 Empty list by default.
 
-## plugins
+## extensions
 A list of plugins to load. Plugins are go modules that can customize the
 desciptors and other parts of sebuild. See the
 [plugin documentation](../plugins.md) for more details.

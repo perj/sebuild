@@ -14,7 +14,7 @@ tests that can otherwise be difficult to figure out.
 
 To allow to run go test via ninja, for each GOTEST descriptor a target
 `build/flavor/gotest/name` is created which you can give to ninja to run the
-test. In addition, you can also run `go test -cover` to generat an html file
+test. In addition, you can also run `go test -cover` to generate an html file
 with this target:
 
     build/<flavor>/gocover/<name>-coverage.html
@@ -28,7 +28,8 @@ argument to the `GOTEST` directive and putting a regexp there, possibly also
 adding additional flags.
 
 The gobuild tool used by GOTEST checks a number of ninja variables when
-executed. These are described on the [GOPROG page](goprog.md).
+executed. These are described on the [GOPROG page](goprog.md). The `gopkg`
+argument described there also works for GOTEST.
 
 As an advanced feature, GOTEST targets are also automatically collected in
 variables, see the
