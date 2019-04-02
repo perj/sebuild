@@ -1,16 +1,15 @@
-## Custom library paths ##
+# Custom Library Paths
 
-If you have libraries in custom places, e.g. `/usr/pgsql-x.x`, the current best
-way to find them is to create a `compile.sh` to setup the paths:
+If you have libraries in custom places, e.g. `/usr/pgsql-x.x`, these can be
+setup in a [confivars files](descriptors/config.md#configvars) or other ninja
+file. Add the variable `ldopts` as such:
 
-    export LIBRARY_PATH=/usr/pgsql-x.x/lib:$LIBRARY_PATH
-    export CPATH=/usr/pgsql-x.x/include
+    ldopts=-L /usr/pgsql-x.x/lib
 
-Maybe even
+For header files the best way might be to use the
+[incdirs argument](arguments/incdirs.md) in the descriptor that needs
+to find these. Another option is to set cflags in an
+[extravars files](descriptors/config.md#extravars).
 
-    export PATH=/usr/pgsql-x.x/bin:$PATH
-
-After you've set those variables run seb from the script.
-
-Additional paths should be allowed to be specified in configvars files in the
-future.
+For more information about how the compiler and linker are invoked, see
+[Compiler and Linker Flags](compiler-flags.md).

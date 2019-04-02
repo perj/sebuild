@@ -1,6 +1,6 @@
-# Multiple targets with the same name
+# Multiple Targets With the Same Name
 
-Since seb resolves dependencies and build rules according to the names of
+Since Sebuild resolves dependencies and build rules according to the names of
 generated files, special care needs to be taken when you end up with multiple
 rules creating several different files with the same names in different
 directories. In general this can only happen when you do something like this:

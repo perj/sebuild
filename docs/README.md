@@ -83,8 +83,10 @@ COMPONENT), that is noted specifically.
 * [Install Specific Arguments - conf, scripts, php, python, symlink](descriptors/install.md#arguments)
 * [Library Specific Arguments - includes, libs, incprefix](descriptors/lib#arguments)
 
-### Customizing sebuild
+### Customizing Sebuild
 
+* [Compiler and Linker Flags](compiler-flags.md) tells you how to modify the default
+  compiler flags used by Sebuild.
 * [Custom Library Paths](custom-paths.md) describe how to find libraries and
   tools in custom locations.
 * [Custom Rules](custom-rules.md) describe how to add more rules that can be
@@ -92,12 +94,12 @@ COMPONENT), that is noted specifically.
 * [Plugins](plugins.md) handles adding custom descriptors, arguments or
   specialsrcs.
 
-### Uncategorized Pages (to be moved)
+### Advanced Topics
 
 * [Separate Top-level Builddesc](separate-builddesc-top.md) tells you how to
   use sub projects that have their own CONFIG descriptor.
 * [Special Files](special-files.md) contains some low-level details about
-  files and rules that sebuild uses.
+  files and rules that Sebuild uses.
 * [Special Variables](special-variables.md) has some details about used Ninja
   variables.
 * [Globbing](globbing.md) describes how globs work in srcs etc.

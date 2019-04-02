@@ -29,3 +29,8 @@ adding additional flags.
 
 The gobuild tool used by GOTEST checks a number of ninja variables when
 executed. These are described on the [GOPROG page](goprog.md).
+
+As an advanced feature, GOTEST targets are also automatically collected in
+variables, see the
+[collect_target_var argument](../arguments/collect-target-var.md) for more more
+information about this.

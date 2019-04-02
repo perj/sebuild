@@ -59,6 +59,15 @@ to your repository.
 Defaults to `git rev-list HEAD 2>/dev/null|wc -l|xargs` (xargs remove
 any formatting wc adds.)
 
+## cflags
+Adds additional flags when using the C and C++ compiler. Must be flavored and
+meant to contain defines, e.g.
+
+    cflags:release[-DNDEBUG]
+
+To set global clfags, use configvars. See also the
+[Compiler and Linker Flags page](../compiler-flags.md).
+
 ## compiler
 
 Override the compiler used, set it to the C compiler, C++ one will be guessed
@@ -142,15 +151,26 @@ and `cwarnflags`.
 Defaults to the bundled `rules/flavor` directory.
 
 ## godeps
-A list if files that all Go target depends on. E.g. you can add go.mod
+A list of files that all Go target depends on. E.g. you can add go.mod
 here to rebuild all go targets when go.mod changes.
+For it to work, you must however also create a custom godeps rule, in
+case you wish to parse the input file in some matter. The simplest
+version of this rule just touches the output:
+
+```
+rule godeps
+    command = touch $out
+```
+
+You have to use the [rules](#rules) argument to name a file containing
+this rule. In the future this requirement might be made optional.
 
 Empty list by default.
 
 ## plugins
 A list of plugins to load. Plugins are go modules that can customize the
-desciptors and other parts of sebuild. See the [plugin
-documentation](../plugins.md) for more details.
+desciptors and other parts of sebuild. See the
+[plugin documentation](../plugins.md) for more details.
 
 ## prefix
 Set a prefix for the installed files for the specified flavor.

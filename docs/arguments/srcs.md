@@ -24,7 +24,7 @@ of the final product, unless anything else is noted below.
 
 ## C and C++ Sources
 
-This are compiled into object files, replacing the `c`, `cc` or `cxx` extension
+These are compiled into object files, replacing the `c`, `cc` or `cxx` extension
 with `o`. Those are further linked into the final product.
 
 ## In Sources
@@ -34,14 +34,24 @@ Also called in-files. A special script is run on these, using the
 `VARIABLE` from that file. It's an error to have undefined variables in the
 in-files. To generate a `%` character use `%%`.
 
-Entire sections can also be enable/disabled based on the current flavor.
+Entire sections can also be enabled/disabled based on the current flavor.
 Text between `%FLAVOR_START%` and `%FLAVOR_END%` marker lines are removed
 unless FLAVOR matches the uppercased version of the current flavore. All
 markers are also removed.
 
-The generate file has the same file name but with `.in` removed. This file
-is NOT further processed but can be used e.g. in a [conf](conf.md) or
-[scripts](scripts.md) argument.
+The generate file has the same file name but with `.in` removed. This file is
+NOT further processed but can be used e.g. in a
+[conf](../descriptors/install.md#conf) or
+[scripts](../descriptors/install.md#scripts) argument.
+
+The script for generating the in.conf file is set using the `inconfig`
+ninja variable. It defaults to `$buildtooldir/scripts/invars.sh`. If you change
+it (e.g. via a [configvars file](../descriptors/config.md#configvars)), make
+sure to source the original to access its functions and the configvars values.
+Use a pair of lines like
+
+    source $buildtooldir/scripts/invars.sh "$@"
+    depend $buildtooldir/scripts/invars.sh
 
 ## Go Sources
 

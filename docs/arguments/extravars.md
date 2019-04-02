@@ -4,5 +4,6 @@
 
 Extra ninja variables needed to build this descriptor. `extravars` will be
 included only in this build descriptor and can therefore reference generated
-paths. Since rules are global and `extranvars` can be included multiple times
-it can't define rules. See special section below to see how to deal with this.
+paths. You can put rules in these files as well, despite the `extravars` name,
+although if you use the same file in multiple descriptors this might cause
+a `duplicate rule definition` ninja error.

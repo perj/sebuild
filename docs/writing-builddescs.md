@@ -1,4 +1,4 @@
-# Writing Builddesc files
+# Writing Builddesc Files
 
 A Builddesc file contains one or more build descriptors, and maybe some
 comments. Example:
@@ -33,4 +33,4 @@ whitespace. Some arguments can only contain one element, this is clarified
 in the argument documentation. Arguments are things like: srcs, includes, libs,
 deps, etc.
 
-Descriptors and arguments are listed on the main [index](README.md) page.
+Descriptors and arguments are listed on the main [index page](README.md).

@@ -1,4 +1,4 @@
-## srcopts
+## Per Source Options - srcopts
 
 You can add compile flags or other optiones on a per source bases.
 Use the format `srcopts[src:flags]` in the Builddesc. For example, to

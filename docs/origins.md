@@ -14,7 +14,7 @@ Initially a perl-script was produced. This was eventually rewritten into Go.
 This documentation was originally written for internal use, and while it's been
 edited for the public release, it will no doubt still reflect those origins.
 
-### Original Authors ###
+## Original Authors
 
 The original design and implementation was done by
 [Artur Grabowski](https://github.com/art4711).

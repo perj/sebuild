@@ -1,7 +1,10 @@
-## Builddesc fragments and includes ##
+# Builddesc fragments and includes - INCLUDE
 
-In some cases we need to build a binary multiple times with optional
-components. In that case it's useful to have partial Builddesc files included
+The INCLUDE argument allows to put part of a Builddesc in a different file.
+This is useful when you want to build the same binary multiple times with
+just a few different optional sources, e.g. linkersets.
+
+In that case it's useful to have partial Builddesc files included
 in the main Builddesc. The INCLUDE[] argument does this. The included fragment
 contains arguments to the build descriptor.
 

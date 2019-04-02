@@ -25,6 +25,8 @@ adds conditions a and b. They can also be passed on the command line, running
 `seb -cond foo` adds the condition `foo`.
 
 Finally they can also be added by the [config script](descriptors/config.md#config_script).
+This is the main way to add conditions dynamically, based on the configuration
+script output.
 
 Conditions can use letters, numbers and underscore (`_`), no other characters
 are allowed.
@@ -33,4 +35,5 @@ are allowed.
 
 A special condition is `nocgo`. If used, the environment variable `CGO_ENABLED`
 will be set to 0. The check is done in the other direction as well, using either
-sets both. This is to sync seb generation with go build invocation.
+sets both. This is to sync Sebuild ninja file generation with go build
+invocation.

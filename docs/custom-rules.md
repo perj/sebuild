@@ -1,40 +1,68 @@
 # Writing Your Own Rules
 
-One behavior of ninja that is important to understand is that rules are global
-while variables can be local (read up ninja documentation to understand
-variable scoping). This means that all rules files can only be included once.
-If you compile a tool that will then be used inside a rule you must therefore
-do something like this:
+Rules are what ninja use to convert input files into output, they are basically
+shell commands. An example rule might look like this:
 
- * `Builddesc`:
+    rule gperf
+        command = gperf -L ANSI-C --output-file=$out $in
+        description = gperf $out
 
-          TOOL_PROG(mytool
-              srcs[...]
-          )
-          INSTALL(conf
-              conf[fooconf]
-              specialsrcs[myrule:fooconf:in.foo]
-              extravars[myvars.ninja]
-          )
+When the gperf rule is used the gperf command is run to create `$out` from `$in`.
+For more details about this see the
+[Ninja documentation](https://ninja-build.org/manual.html).
 
- * `<global>/rules.ninja`:
+## Where to Put Your Rules
 
-          rule myrule
-              command=$mytool $in $out
+Ninja rules can only be defined once. This means you have to be a bit careful
+about where you define them. Easiest is to use the
+[rules config argument](descriptors/config.md#rules) to name a file that
+contain all your custom rules. There is however no restriction on using any
+of the other arguments naming ninja files, such as
+[extravars](arguments/extravars.md), if you're sure it will only be included
+once.
 
- * `myvars.ninja`:
+## Remove the Output on Failures
 
-          mytool=$buildtools/mytool
+You have to be careful that if your rule command fails, the output file must
+be manually removed. Many standard commands does this automatically, but
+several will not. Thus your command might need to do this manually, like this:
 
- * `<topdir>/Builddesc`
-          CONFIG(... ruledeps[... myrule:$mytool] ...)
+    command = cat > $out < $in || ( rm -f "$out" ; exit 1 )
 
-This uses the fact that rules have to defined globally, but the variables that
-the rules are using are scoped. So we can get away with having a local scope on
-the definition of the tool we use.
+## Using Rules
 
-Notice the special top level CONFIG addition. This tells ninja that all targets
-built with the new rule should depend on the tool. If the tool changes,
-everything built with the tool should be rebuilt. If you depend on a tool and a
-configuration file you can specify multiple dependencies for the rule separated
-by a comma, like this `ruledeps[...  myrule:$mytool,$myconfigfile ...]`.
+Custom rules are primarily used via the
+[specialsrcs argument](arguments/specialsrcs.md). With it you name the rule to
+use as well as the input and output files. You can also add additional local
+ninja variables if you wish, which can be used in the rule.
+
+## Dependencies
+
+If the command your custom rule use depends on files in the local repository
+you should setup a dependency on those files for when your custom rule is used.
+That's done using the
+[ruledeps config argument](descriptors/config.md#ruledeps). For example when
+you have the rule
+
+    rule myrule
+        command = myscript.sh $out $in
+
+In the CONFIG descriptor your should add
+
+    ruledeps[
+            myrule:myscript.sh
+    ]
+
+It might be a good practice to use a Ninja variable to make sure they're kept
+in sync. You can set the variable in the rules file and used it in ruledeps:
+
+    myrule_tool=myscript.sh
+    rule myrule
+        command = $myrule_tool $out $in
+
+    ...
+
+    ruledeps[
+            myrule:$myrule_tool
+    ]
+
