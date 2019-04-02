@@ -11,7 +11,7 @@ The seb tool generates build.ninja files from special Builddesc files that
 describe how various components of the build should be handled.
 
 This is a very brief description. For information on how to write Builddesc
-files refer to COMPILING.md.
+files refer to the documentation site, https://schibsted.github.io/sebuild
 
 ## OPTIONS
 
@@ -54,4 +54,5 @@ files refer to COMPILING.md.
 
 ## SEE ALSO
 
-COMPILING.md
+There should be an extensive set of markdown documentation files bundled with
+this tool. They're also available at https://schibsted.github.io/sebuild

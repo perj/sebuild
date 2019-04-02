@@ -2,8 +2,8 @@
 
 // Tool for compiling projects with ninja.
 //
-// Please see seb.1.ronn.md and COMPILING.md for more information
-// about this tool.
+// Please see seb.1.ronn.md and https://schibsted.github.io/sebuild for more
+// information about this tool.
 package main
 
 //go:generate go-bindata -nomemcopy -ignore Builddesc -prefix ../../ ../../internal/... ../../rules/...
