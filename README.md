@@ -39,8 +39,9 @@ PROG(myprog
 When you run seb with no arguments, this will produce the file
 `build/dev/bin/myprog`.
 
-For more details and instructions see [COMPILING.md](docs/COMPILING.md) and
-the [seb man page](cmd/seb/seb.1.ronn.md).
+For more details and instructions see the
+[documentation site](https://schibsted.github.io/sebuild) and the
+[seb man page](cmd/seb/seb.1.ronn.md).
 
 ## LICENSE
 
