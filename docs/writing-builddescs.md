@@ -33,4 +33,4 @@ whitespace. Some arguments can only contain one element, this is clarified
 in the argument documentation. Arguments are things like: srcs, includes, libs,
 deps, etc.
 
-Descriptors and arguments are listed on the main [index page](README.md).
+Descriptors and arguments are listed on the main [index page](index.md).
