@@ -85,7 +85,7 @@ func (ops *GlobalOps) RecompileWithPlugins() {
 			gofiles = append(gofiles, filepath.Join(mypkg.Dir, f))
 		}
 	} else {
-		d := ops.BuildtoolDir()
+		d := BuildtoolDir()
 		pattern := filepath.Join(d, "cmd", "seb", "*.go")
 		gofiles, err = filepath.Glob(pattern)
 		if err != nil {

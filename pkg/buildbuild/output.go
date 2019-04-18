@@ -37,7 +37,17 @@ func mkpath(p ...string) {
 	}
 }
 
+// Buildtooldir calls the package level BuildtoolDir. Kept for v1
+// compatibility only.
 func (ops *GlobalOps) BuildtoolDir() string {
+	return BuildtoolDir()
+}
+
+// Buildtooldir figures out what directory contains the sebuild ninja runtime.
+// First it tries to import the go package and check for sources, if that
+// fails it looks for a directory based on the binary path. If that als fails
+// it checks $HOME/.seb/
+func BuildtoolDir() string {
 	if p := os.Getenv("BUILDTOOLDIR"); p != "" {
 		return p
 	}
@@ -75,8 +85,8 @@ func (ops *GlobalOps) BuildtoolDir() string {
 				return srcp
 			}
 		}
-		// If directory is called "se-build-build" we're probably running from a source directory.
-		if filepath.Base(p) == "se-build-build" {
+		// If directory is called "sebuild" we're probably running from a source directory.
+		if filepath.Base(p) == "sebuild" {
 			// Check for rules.ninja just in case.
 			_, err := os.Stat(filepath.Join(p, "rules/rules.ninja"))
 			if err == nil {
@@ -103,7 +113,7 @@ func (ops *GlobalOps) StatRulePath(pth string) bool {
 	// Special handle $buildtooldir. Not super happy about it
 	// but it's the only solution I can think of.
 	if strings.HasPrefix(pth, "$buildtooldir") {
-		pth = ops.BuildtoolDir() + pth[len("$buildtooldir"):]
+		pth = BuildtoolDir() + pth[len("$buildtooldir"):]
 	}
 	_, err := os.Stat(pth)
 	return err == nil
@@ -143,6 +153,7 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	w := bufio.NewWriter(topfile)
 
 	fmt.Fprintf(w, "# %s\n", BuildBuildArgs(os.Args))
+	fmt.Fprintf(w, "# %s\n", BuildtoolDir())
 	fmt.Fprintf(w, "# Flavors: %s\n", strings.Join(ops.Config.ActiveFlavors, ", "))
 	conds := make([]string, 0, len(ops.Config.Conditions))
 	for c := range ops.Config.Conditions {
@@ -168,7 +179,7 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	fmt.Fprintf(w, "cgo_enabled=$$CGO_ENABLED\n")
 
 	fmt.Fprintf(w, "build_build = %s\n", BuildBuildArgs(os.Args))
-	fmt.Fprintf(w, "buildtooldir=%s\n", ops.BuildtoolDir())
+	fmt.Fprintf(w, "buildtooldir=%s\n", BuildtoolDir())
 	fmt.Fprintf(w, "inconfig = $buildtooldir/scripts/invars.sh\n")
 	cv := strings.TrimSpace(strings.Join(ops.Config.Configvars, " "))
 	if cv == "" {

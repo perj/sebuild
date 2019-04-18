@@ -166,7 +166,7 @@ func (ops *GlobalOps) RegisterGlob(srcdir, src string) {
 
 func (ops *GlobalOps) ReExec() {
 	if _, ok := os.LookupEnv("BUILDTOOLDIR"); !ok {
-		btp := ops.BuildtoolDir()
+		btp := BuildtoolDir()
 		os.Setenv("BUILDTOOLDIR", btp)
 	}
 	binpath := filepath.Join(ops.Config.Buildpath, "obj", "_build_build")
