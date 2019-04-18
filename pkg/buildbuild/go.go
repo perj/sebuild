@@ -6,8 +6,10 @@ import "strings"
 
 type GoProgDesc struct {
 	LinkDesc
-	Pkg   string
-	NoCgo bool
+	Pkg    string
+	NoCgo  bool
+	GOOS   string
+	GOARCH string
 }
 
 type GoTestDesc struct {
@@ -29,10 +31,12 @@ func (tmpl *GoTestDesc) NewFromTemplate(bd, tname string, flavors []string) Desc
 }
 
 func (g *GoProgDesc) Parse(ops *GlobalOps, realsrcdir string, args map[string][]string) Descriptor {
-	desc := g.GenericParse(g, ops, realsrcdir, args, LinkerExtra("gopkg", "nocgo"))
+	desc := g.GenericParse(g, ops, realsrcdir, args, LinkerExtra("gopkg", "nocgo", "goos", "goarch"))
 	g.LinkerParse(realsrcdir, args)
 	g.Pkg = strings.Join(args["gopkg"], " ")
 	g.NoCgo = args["nocgo"] != nil
+	g.GOOS = strings.Join(args["goos"], " ")
+	g.GOARCH = strings.Join(args["goarch"], " ")
 	return desc
 }
 
@@ -57,6 +61,12 @@ func (g *GoProgDesc) Finalize(ops *GlobalOps) {
 		eas = append(eas, "gomode=prog-nocgo")
 	} else {
 		eas = append(eas, "gomode=prog")
+	}
+	if g.GOOS != "" {
+		eas = append(eas, "goos="+g.GOOS)
+	}
+	if g.GOARCH != "" {
+		eas = append(eas, "goarch="+g.GOARCH)
 	}
 
 	target := g.AddTarget(g.TargetName, "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, g.TargetOptions)

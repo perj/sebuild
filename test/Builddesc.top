@@ -1,7 +1,7 @@
 # Copyright 2018 Schibsted
 
 CONFIG(
-	flavors[regress]
+	flavors[regress prod]
 	configvars[config.ninja]
 	config_script[./config_script.sh]
 	rules[rules.ninja]

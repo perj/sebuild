@@ -1,6 +1,7 @@
 # Copyright 2018 Schibsted
 
 COMPONENT([
+	goarch
 	go/src/gopath
 	collect_special
 	srcdir

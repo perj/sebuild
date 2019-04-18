@@ -126,13 +126,13 @@ pool gobuilds
 gobuild_tool=GOPATH="$gopath" GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$gobuild_test_flags CGO_ENABLED=$cgo_enabled $buildtooldir/internal/tools/gobuild.sh
 
 rule gobuild
-    command = $gobuild_tool "$gopkg" "$in" "$out" "$objdir/depfile-$gomode" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
+    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$objdir/depfile-$gomode" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
     depfile = $objdir/depfile-$gomode
     description = building go program $out from $in
     pool = gobuilds
 
 rule gobuildlib
-    command = $gobuild_tool "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
+    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
     depfile = $depfile
     description = building go library $out from $in
     pool = gobuilds

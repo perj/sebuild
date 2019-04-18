@@ -16,7 +16,26 @@ argument](../arguments/extravars.md).
 Additionally, setting the `nocgo` [condition](../conditions.md) disables cgo
 for all programs.
 
-## Build some Other Package
+## Arguments
+
+### nocgo
+
+Use with an empty value, i.e. `nocgo[]`. Disables cgo for this binary.
+
+### goarch
+
+Sets the goarch to compile for, useful when compiling binaries that will be
+deployed. Commonly set together with goos for a specific flavor.
+Example:
+
+	goos:release[linux]
+	goarch:release[amd64]
+
+### goos
+
+Sets the goos to compile for. See [goarch](#goarch) for more information.
+
+### gopkg
 
 You can use GOPROG without having the go sources present in the same directory.
 If you use the `gopkg` argument that Go package will be compiled instead of the
