@@ -101,7 +101,7 @@ fi
 
 case "$mode" in
 	cover)
-		go test -coverprofile="$out" $PKG
+		go test $GOBUILD_FLAGS -coverprofile="$out" $GOBUILD_TEST_FLAGS $PKG
 	;;
 	prog-nocgo)
 		CGO_ENABLED=0

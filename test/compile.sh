@@ -8,13 +8,18 @@ CC='env cc' seb -condition cfoo -condition cbar
 touch Builddesc # to make ninja invoke seb.
 ninja -f $BUILDPATH/build.ninja
 
-grep '# Flavors: regress' $BUILDPATH/build.ninja
+grep '# Flavors: regress, prod' $BUILDPATH/build.ninja
 grep '# Conditions:.*cbar, .*cbaz, .*cfoo' $BUILDPATH/build.ninja
 
 grep -q gopath $BUILDPATH/regress/collect_test/hejsan.txt
 grep -q gopath $BUILDPATH/regress/collect_test/other.txt
 grep -q bar $BUILDPATH/obj/regress/lib/test
 grep -q fooval $BUILDPATH/regress/regress/infile/infile
+
+# Check regress flavor for darwin 386 build
+grep -q rt0_386_darwin $BUILDPATH/regress/bin/goarch
+# Check prod flavor is executable.
+$BUILDPATH/prod/bin/goarch
 
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gotest/gopath
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html
