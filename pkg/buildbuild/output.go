@@ -45,7 +45,7 @@ func (ops *GlobalOps) BuildtoolDir() string {
 
 // Buildtooldir figures out what directory contains the sebuild ninja runtime.
 // First it tries to import the go package and check for sources, if that
-// fails it looks for a directory based on the binary path. If that als fails
+// fails it looks for a directory based on the binary path. If that also fails
 // it checks $HOME/.seb/
 func BuildtoolDir() string {
 	if p := os.Getenv("BUILDTOOLDIR"); p != "" {
