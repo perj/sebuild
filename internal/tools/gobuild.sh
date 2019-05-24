@@ -97,6 +97,10 @@ if [ -z "$PKG" ] && [ -n "$(cd "$ABSIN" 2>/dev/null && go env GOMOD 2>/dev/null)
 fi
 [ -z "$PKG" ] && cd "$ABSIN" > /dev/null
 
+# Do the deps file async to speed it up slightly.
+# It's waited for at the end as long as the compile worked.
+( echo -n "$OUT: " ; go list $GOBUILD_FLAGS -deps -f '{{$dir:=.Dir}}{{range .GoFiles}}{{$dir}}/{{.}} {{end}}{{range .CgoFiles}}{{$dir}}/{{.}} {{end}}{{range .HFiles}}{{$dir}}/{{.}} {{end}}{{range .CFiles}}{{$dir}}/{{.}} {{end}}{{range .TestGoFiles}}{{$dir}}/{{.}} {{end}}' $PKG ) > "$depfile" &
+
 case "$mode" in
 	cover)
 		go test $GOBUILD_FLAGS -coverprofile="$out" $GOBUILD_TEST_FLAGS $PKG
@@ -137,4 +141,5 @@ case "$mode" in
 	;;
 esac
 
-( echo -n "$OUT: " ; go list -f "${PKG:-.}"' {{range .Deps}}{{.}} {{end}}' $PKG | xargs go list -f '{{$dir:=.Dir}}{{range .GoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CgoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .HFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .TestGoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}' ) | tr "\n" " " > "$depfile" || exit 1
+# Wait for depfile generator.
+wait
