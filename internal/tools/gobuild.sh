@@ -73,8 +73,6 @@ if [ -z "$mode" ]; then
 	mode="prog"
 fi
 
-BUILDFLAGS="-i -pkgdir $(cd "$pkgdir" ; pwd)/gopkg_$mode -installsuffix=$mode $GOBUILD_FLAGS"
-
 if [ "$mode" = "test" ]; then
 	[ -z "$PKG" ] && cd "$ABSIN"
 	exec go test $GOBUILD_FLAGS $GOBUILD_TEST_FLAGS $PKG
@@ -99,6 +97,10 @@ if [ -z "$PKG" ] && [ -n "$(cd "$ABSIN" 2>/dev/null && go env GOMOD 2>/dev/null)
 fi
 [ -z "$PKG" ] && cd "$ABSIN" > /dev/null
 
+# Do the deps file async to speed it up slightly.
+# It's waited for at the end as long as the compile worked.
+( echo -n "$OUT: " ; go list $GOBUILD_FLAGS -deps -f '{{$dir:=.Dir}}{{range .GoFiles}}{{$dir}}/{{.}} {{end}}{{range .CgoFiles}}{{$dir}}/{{.}} {{end}}{{range .HFiles}}{{$dir}}/{{.}} {{end}}{{range .CFiles}}{{$dir}}/{{.}} {{end}}{{range .TestGoFiles}}{{$dir}}/{{.}} {{end}}' $PKG ) > "$depfile" &
+
 case "$mode" in
 	cover)
 		go test $GOBUILD_FLAGS -coverprofile="$out" $GOBUILD_TEST_FLAGS $PKG
@@ -106,13 +108,13 @@ case "$mode" in
 	prog-nocgo)
 		CGO_ENABLED=0
 		export CGO_ENABLED
-		go build $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
+		go build $GOBUILD_FLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
 	;;
 	test-prog)
-		go test -c $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
+		go test -c $GOBUILD_FLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
 	;;
 	""|prog)
-		go build $BUILDFLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
+		go build $GOBUILD_FLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
 	;;
 	*)
 		# go build links an executable to extract the symbols. If this is a plugin there'll be
@@ -120,6 +122,8 @@ case "$mode" in
 		if [ "$(go env GOOS)" != darwin ]; then
 			CGO_LDFLAGS="-Wl,--unresolved-symbols=ignore-in-object-files $CGO_LDFLAGS"
 		fi
+		BUILDFLAGS="-i -pkgdir $(cd "$pkgdir" ; pwd)/gopkg_$mode -installsuffix=$mode $GOBUILD_FLAGS"
+
 		if [ "$mode" = "piclib" ]; then
 			# -a to build standard libs with -shared
 			go build $BUILDFLAGS -buildmode=c-archive -gcflags='-shared' -asmflags='-shared' -a -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
@@ -137,4 +141,5 @@ case "$mode" in
 	;;
 esac
 
-( echo -n "$OUT: " ; go list -f "${PKG:-.}"' {{range .Deps}}{{.}} {{end}}' $PKG | xargs go list -f '{{$dir:=.Dir}}{{range .GoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CgoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .HFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .CFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}{{range .TestGoFiles}}{{$dir}}/{{.}}{{"\n"}}{{end}}' ) | tr "\n" " " > "$depfile" || exit 1
+# Wait for depfile generator.
+wait

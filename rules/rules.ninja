@@ -112,10 +112,11 @@ rule generate_ninjas
     command = BUILD_BUILD_FROM_NINJA=1 CC="$cc" BUILDTOOLDIR="$buildtooldir" $build_build
     generator=
 
-# Since go build runs install dependency packages they can't be run in
-# parallel, they would stomp on each-others download.
-
-pool gobuilds
+# Since go build runs with custom pkgdirs install dependency packages
+# they can't be run in parallel, only allow one at a time for these modes.
+pool gobuilds_lib
+    depth = 1
+pool gobuilds_piclib
     depth = 1
 
 # The gobuild script uses some environment variables. We allow these to be set
@@ -129,34 +130,29 @@ rule gobuild
     command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$objdir/depfile-$gomode" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
     depfile = $objdir/depfile-$gomode
     description = building go program $out from $in
-    pool = gobuilds
 
 rule gobuildlib
     command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
     depfile = $depfile
     description = building go library $out from $in
-    pool = gobuilds
+    pool = gobuilds_$gomode
 
 rule gotest
     command = $gobuild_tool "$gopkg" "$in" "" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" test "$builddir"
     description = testing go package in $in
-    pool = gobuilds
 
 rule gobench
     command = $gobuild_tool "$gopkg" "$in" "" "$benchflags" "-I $incdir $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" bench "$builddir"
     description = benching go package in $in
-    pool = gobuilds
 
 rule gocover
     command = $gobuild_tool "$gopkg" "$in" "$out" "$objdir/depfile-cover" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover "$builddir"
     depfile = $objdir/depfile-cover
     description = testing coverage of go package in $in
-    pool = gobuilds
 
 rule gocover_html
     command = $gobuild_tool "$gopkg" "$in" "$out" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover_html "$builddir"
     description = coverage to html of go package in $in
-    pool = gobuilds
 
 rule goaddmain
     command = install -m644 "$in" "$out"

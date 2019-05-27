@@ -7,7 +7,7 @@ also run ninja to compile your project.
 # Installation
 
 To use sebuild, go get the seb binary. You will need to have a recent version
-of go installed, we currently support Go 1.10 and higher.
+of go installed, we currently support Go 1.12 and higher.
 
 	go get github.com/schibsted/sebuild/cmd/seb
 
