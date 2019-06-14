@@ -8,10 +8,8 @@ package buildbuild
 import (
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
-	"syscall"
 )
 
 // Global build configuration.
@@ -164,17 +162,6 @@ func (ops *GlobalOps) RegisterGlob(srcdir, src string) {
 	}
 }
 
-func (ops *GlobalOps) ReExec() {
-	if _, ok := os.LookupEnv("BUILDTOOLDIR"); !ok {
-		btp := BuildtoolDir()
-		os.Setenv("BUILDTOOLDIR", btp)
-	}
-	binpath := filepath.Join(ops.Config.Buildpath, "obj", "_build_build")
-	if err := syscall.Exec(binpath, os.Args, syscall.Environ()); err != nil {
-		panic(err)
-	}
-}
-
 type PluginDep struct {
 	ppath string
 	os.FileInfo
@@ -215,46 +202,6 @@ func (ops *GlobalOps) PluginDeps() (deps []PluginDep) {
 		}
 	}
 	return
-}
-
-func (ops *GlobalOps) MaybeReExec() {
-	binpath := filepath.Join(ops.Config.Buildpath, "obj", "_build_build")
-	if binpath == os.Args[0] {
-		return
-	}
-	theirinfo, err := os.Stat(binpath)
-	if err != nil {
-		// If they don't exist then we proceed ourselves.
-		return
-	}
-	me, err := exec.LookPath(os.Args[0])
-	if err != nil {
-		var tmp error
-		me, tmp = filepath.EvalSymlinks("/proc/self/exe")
-		if tmp != nil {
-			// Return the original error, /proc/self is just a fallback.
-			panic(err)
-		}
-	}
-	if me == binpath {
-		return
-	}
-	myinfo, err := os.Stat(me)
-	if err != nil {
-		panic(err)
-	}
-	if !theirinfo.ModTime().After(myinfo.ModTime()) {
-		// If we're newer than them, then we can't trust them to be up to date.
-		return
-	}
-	// Check plugins as well.
-	deps := ops.PluginDeps()
-	for _, pi := range deps {
-		if !theirinfo.ModTime().After(pi.ModTime()) {
-			return
-		}
-	}
-	ops.ReExec()
 }
 
 func NormalizePath(basedir, p string) string {
