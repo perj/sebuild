@@ -69,6 +69,13 @@ IFS="$orig_IFS"
 # Strip initial :
 GOPATH="${gopath:1}"
 
+# If we have an explicit GOPATH then disable go modules.
+# Probably will want to drop support for GOPATH quite soon, but that should be
+# a major release so it will have to wait for that.
+if [ -n "$GOPATH" ]; then
+	export GO111MODULE=off
+fi
+
 if [ -z "$mode" ]; then
 	mode="prog"
 fi
@@ -82,9 +89,6 @@ if [ "$mode" = "bench" ]; then
 	exec go test $GOBUILD_FLAGS $GOBUILD_TEST_FLAGS $PKG -bench $4
 fi
 if [ "$mode" = "cover_html" ]; then
-	# If we have a GOPATH then disable go modules or go 1.11 might fail
-	# to find the package due to assuming it to on based on $PWD.
-	[ -n "$GOPATH" ] && export GO111MODULE=off
 	exec go tool cover -html=$IN -o "$OUT"
 fi
 
