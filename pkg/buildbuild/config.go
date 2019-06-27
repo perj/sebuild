@@ -308,12 +308,7 @@ func (ops *GlobalOps) StartupPlugins(srcdir string, s *Scanner, flavors []string
 		}
 	}
 	if len(missingPlugins) > 0 {
-		ops.MaybeReExec()
-		if !ops.Options.Quiet {
-			fmt.Fprintf(os.Stderr, "Plugins not compiled: %s\n", strings.Join(missingPlugins, " "))
-		}
-		ops.RecompileWithPlugins()
-		ops.ReExec()
+		panic("Failed to load plugins: " + strings.Join(missingPlugins, ", "))
 	}
 
 	return ops.ParseDescriptorEnd

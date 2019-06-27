@@ -1,6 +1,6 @@
 // Copyright 2018 Schibsted
 
-package exts
+package main
 
 import (
 	"strings"

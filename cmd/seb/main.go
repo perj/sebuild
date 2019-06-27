@@ -55,8 +55,7 @@ var (
 
 func main() {
 	ops := buildbuild.NewGlobalOps()
-	// Disable BuildPlugin for now, it's too buggy on 1.8beta1
-	//ops.BuildPlugin = BuildPlugin
+	ops.BuildPlugin = BuildPlugin
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage: %s [options] [--] [<ninja-args>]\n", os.Args[0])
 		flag.PrintDefaults()
