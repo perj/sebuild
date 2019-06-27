@@ -204,7 +204,7 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	}
 	fmt.Fprintf(w, "include $buildtooldir/rules/rules.ninja\n")
 	if len(ops.Config.Godeps) > 0 {
-		fmt.Fprintf(w, "build %s: godeps %s\n", ops.GodepsStamp(),
+		fmt.Fprintf(w, "build %s: %s %s\n", ops.GodepsStamp(), ops.Config.GodepsRule,
 			strings.Join(ops.Config.Godeps, " "))
 		mkpath(toppath, "obj/_go")
 	}

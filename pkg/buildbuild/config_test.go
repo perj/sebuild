@@ -83,6 +83,7 @@ compiler[cc2]
 		BuildversionScript: "bv.sh",
 		Buildpath:          "buildpath",
 		ConfigScript:       "./config_script.sh",
+		GodepsRule:         "godeps",
 	}
 
 	if !reflect.DeepEqual(c, e) {

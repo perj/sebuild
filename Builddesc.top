@@ -2,6 +2,8 @@
 
 CONFIG(
 	config_script[scripts/seb_config.sh]
+	godeps[go.mod]
+	godeps_rule[touch]
 )
 
 COMPONENT([
