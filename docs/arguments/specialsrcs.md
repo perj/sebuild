@@ -36,6 +36,11 @@ descriptor](../descriptors/config.md) via the `rules` argument there.
 
 Simply concatenates the sources into the target, can also be used to copy files.
 
+### touch
+
+Runs the touch command on the output file, ignores inputs. Useful for
+[godeps_rule](../descriptors/config.md#godeps-and-godeps_rule).
+
 ### gperf_switch
 
 The source should be a C or C++ file. Inside these you can have

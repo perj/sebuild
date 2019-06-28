@@ -86,6 +86,9 @@ rule concat
     command = cat $in > $out
     description = concatenate $in to $out
 
+rule touch
+    command = touch $out
+
 gperf_enum = $buildtooldir/internal/tools/gperf_enum.pl
 rule gperf_enum
     command = $gperf_enum $out $in

@@ -157,20 +157,23 @@ and `cwarnflags`.
 
 Defaults to the bundled `rules/flavor` directory.
 
-## godeps
+## godeps and godeps_rule
 A list of files that all Go target depends on. E.g. you can add go.mod
 here to rebuild all go targets when go.mod changes.
-For it to work, you must however also create a custom godeps rule, in
-case you wish to parse the input file in some matter. The simplest
-version of this rule just touches the output:
 
-```
-rule godeps
-    command = touch $out
-```
+By default this tries to execute a `godeps` rule, which you can define
+in a rules.ninja file. You can however also change the rule used with
+the `godeps_rule` argument. For simple cases the
+[touch](../arguments/specialsrcs.md#touch) rule should be suitable.
 
-You have to use the [rules](#rules) argument to name a file containing
-this rule. In the future this requirement might be made optional.
+For example
+
+	godeps[go.mod]
+	godeps_rule[touch]
+
+is enough to rebuild all Go targets when go.mod changes.
+
+In 2.0 `touch` will be made the default value for `godeps_rule`
 
 Empty list by default.
 

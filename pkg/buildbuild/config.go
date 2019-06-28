@@ -81,10 +81,11 @@ type Config struct {
 	FlavorRuleDir         string
 	CompilerFlavorRuleDir string
 
-	Ruledeps  map[string][]string // Additional dependencies for particular rules.
-	Buildvars []string
-	Compiler  []string
-	Godeps    []string
+	Ruledeps   map[string][]string // Additional dependencies for particular rules.
+	Buildvars  []string
+	Compiler   []string
+	Godeps     []string
+	GodepsRule string
 
 	BuildversionScript string
 	Buildpath          string
@@ -120,6 +121,7 @@ func (ops *GlobalOps) DefaultConfig() {
 	ops.Config.CompilerRuleDir = "$buildtooldir/rules/compiler"
 	ops.Config.FlavorRuleDir = "$buildtooldir/rules/flavor"
 	ops.Config.CompilerFlavorRuleDir = "$buildtooldir/rules/compiler-flavor"
+	ops.Config.GodepsRule = "godeps"
 
 	ops.Config.Conditions[runtime.GOOS] = true
 	if runtime.GOARCH == "amd64" {
@@ -223,6 +225,7 @@ func (ops *GlobalOps) ParseConfig(srcdir string, s *Scanner, flavors []string) P
 		{"compiler_rule_dir", &ops.Config.CompilerRuleDir},
 		{"flavor_rule_dir", &ops.Config.FlavorRuleDir},
 		{"compiler_flavor_rule_dir", &ops.Config.CompilerFlavorRuleDir},
+		{"godeps_rule", &ops.Config.GodepsRule},
 	} {
 		if args.Unflavored[conf.key] != nil {
 			*conf.conf = strings.Join(args.Unflavored[conf.key], " ")
