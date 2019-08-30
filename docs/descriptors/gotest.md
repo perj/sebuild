@@ -35,3 +35,7 @@ As an advanced feature, GOTEST targets are also automatically collected in
 variables, see the
 [collect_target_var argument](../arguments/collect-target-var.md) for more more
 information about this.
+
+Unfortunately, the go coverage html generating does not currently work in other
+go modules than the main one. There is no easy way to solve this so it's kept
+as a known issue.

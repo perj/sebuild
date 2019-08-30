@@ -69,13 +69,6 @@ IFS="$orig_IFS"
 # Strip initial :
 GOPATH="${gopath:1}"
 
-# If we have an explicit GOPATH then disable go modules.
-# Probably will want to drop support for GOPATH quite soon, but that should be
-# a major release so it will have to wait for that.
-if [ -n "$GOPATH" ]; then
-	export GO111MODULE=off
-fi
-
 if [ -z "$mode" ]; then
 	mode="prog"
 fi
@@ -89,6 +82,10 @@ if [ "$mode" = "bench" ]; then
 	exec go test $GOBUILD_FLAGS $GOBUILD_TEST_FLAGS $PKG -bench $4
 fi
 if [ "$mode" = "cover_html" ]; then
+	# On Go 1.11 and 1.12 only, auto modules might fail here due to being
+	# run from outside gopath but working on files inside. Go 1.11 is not
+	# supported.
+	[ -n "$GOPATH" ] && [ "${GO111MODULE:-auto}" = auto ] && [ "$(go version|cut -b 12-17)" = go1.12 ] && export GO111MODULE=off
 	exec go tool cover -html=$IN -o "$OUT"
 fi
 
@@ -96,10 +93,18 @@ fi
 out="$(cd "$(dirname "$OUT")" ; pwd)/$(basename "$OUT")"
 depfile="$(cd "$(dirname "$DEPFILE")" ; pwd)/$(basename "$DEPFILE")"
 
-if [ -z "$PKG" ] && [ -n "$(cd "$ABSIN" 2>/dev/null && go env GOMOD 2>/dev/null)" ]; then
+
+# Using a relative path helps the error messages, since we don't have to
+# change the current directory, but it won't work if it's not within the
+# same module.
+gomod="$(go env GOMOD)"
+if [ -z "$PKG" ] && [ -n "$gomod" ] && [ "$(cd "$ABSIN" 2>/dev/null && go env GOMOD 2>/dev/null)" = "$gomod" ]; then
 	PKG="./$IN"
 fi
-[ -z "$PKG" ] && cd "$ABSIN" > /dev/null
+if [ -z "$PKG" ]; then
+	cd "$ABSIN" > /dev/null
+	echo "gobuild: Entering directory \`$ABSIN'"
+fi
 
 # Do the deps file async to speed it up slightly.
 # It's waited for at the end as long as the compile worked.
