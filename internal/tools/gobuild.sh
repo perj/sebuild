@@ -82,6 +82,10 @@ if [ "$mode" = "bench" ]; then
 	exec go test $GOBUILD_FLAGS $GOBUILD_TEST_FLAGS $PKG -bench $4
 fi
 if [ "$mode" = "cover_html" ]; then
+	# On Go 1.11 and 1.12 only, auto modules might fail here due to being
+	# run from outside gopath but working on files inside. Go 1.11 is not
+	# supported.
+	[ -n "$GOPATH" ] && [ "${GO111MODULE:-auto}" = auto ] && [ "$(go version|cut -b 12-17)" = go1.12 ] && export GO111MODULE=off
 	exec go tool cover -html=$IN -o "$OUT"
 fi
 
