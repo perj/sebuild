@@ -3,6 +3,8 @@
 COMPONENT([
 	goarch
 	go/src/gopath
+	gomodules/loader
+	gomodules/module
 	collect_special
 	srcdir
 	c

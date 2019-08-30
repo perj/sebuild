@@ -51,6 +51,7 @@ directory.
 * [Go Program - GOPROG](descriptors/goprog.md)
 * [Go Tests - GOTEST](descriptors/gotest.md)
 * [Dynamic Modules - MODULE](descriptors/module.md)
+* [Go Dynamic Modules - GOMODULE](descriptors/gomodule.md)
 * [Scripts, Configuration and Other Files - INSTALL](descriptors/install.md)
 
 The next set is for generating intermediate libraries and tool files in the

@@ -125,6 +125,9 @@ case "$mode" in
 	""|prog)
 		go build $GOBUILD_FLAGS -o "$out" "${EXTLDFLAGS[@]}" $PKG || exit 1
 	;;
+	module)
+		go build $GOBUILD_FLAGS -o "$out" -buildmode=plugin "${EXTLDFLAGS[@]}" $PKG || exit 1
+	;;
 	*)
 		# go build links an executable to extract the symbols. If this is a plugin there'll be
 		# unresolved symbols. Ignore now, handle in final link.

@@ -4,7 +4,8 @@
 
 Normally PROG and MODULE installs in predefined target directories, but in some
 cases you might need to override this, for example for perl modules or to
-install to libexec/ instead of bin/.
+install to libexec/ instead of bin/. This argument works for GOPROG and
+GOMODULE as well.
 
 There are some special values for the first step in `destdir`. You write these
 like a normal directory path but they will be translated by Sebuild into other

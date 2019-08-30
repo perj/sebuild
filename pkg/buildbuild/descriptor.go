@@ -67,6 +67,7 @@ type Analyser struct {
 var DefaultDescriptors = map[string]Descriptor{
 	"PROG":          &ProgTemplate,
 	"GOPROG":        &GoprogTemplate,
+	"GOMODULE":      &GomoduleTemplate,
 	"GOTEST":        &GotestTemplate,
 	"TOOL_PROG":     &ToolProgTemplate,
 	"TOOL_INSTALL":  &ToolInstallTemplate,

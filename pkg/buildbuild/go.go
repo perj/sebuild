@@ -2,11 +2,15 @@
 
 package buildbuild
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type GoProgDesc struct {
 	LinkDesc
 	Pkg    string
+	Mode   string
 	NoCgo  bool
 	GOOS   string
 	GOARCH string
@@ -21,6 +25,7 @@ type GoTestDesc struct {
 func (tmpl *GoProgDesc) NewFromTemplate(bd, tname string, flavors []string) Descriptor {
 	return &GoProgDesc{
 		LinkDesc: *tmpl.LinkDesc.NewFromTemplate(bd, tname, flavors),
+		Mode:     tmpl.Mode,
 	}
 }
 
@@ -31,7 +36,12 @@ func (tmpl *GoTestDesc) NewFromTemplate(bd, tname string, flavors []string) Desc
 }
 
 func (g *GoProgDesc) Parse(ops *GlobalOps, realsrcdir string, args map[string][]string) Descriptor {
-	desc := g.GenericParse(g, ops, realsrcdir, args, LinkerExtra("gopkg", "nocgo", "goos", "goarch"))
+	lextra := LinkerExtra("gopkg", "nocgo", "goos", "goarch")
+	// Go plugins currently does not support cgo disabled.
+	if g.Mode == "module" {
+		lextra = LinkerExtra("gopkg", "goos", "goarch")
+	}
+	desc := g.GenericParse(g, ops, realsrcdir, args, lextra)
 	g.LinkerParse(realsrcdir, args)
 	g.Pkg = strings.Join(args["gopkg"], " ")
 	g.NoCgo = args["nocgo"] != nil
@@ -58,9 +68,9 @@ func (g *GoProgDesc) Finalize(ops *GlobalOps) {
 		eas = append(eas, "gopkg="+g.Pkg)
 	}
 	if g.NoCgo {
-		eas = append(eas, "gomode=prog-nocgo")
+		eas = append(eas, fmt.Sprintf("gomode=%s-nocgo", g.Mode))
 	} else {
-		eas = append(eas, "gomode=prog")
+		eas = append(eas, "gomode="+g.Mode)
 	}
 	if g.GOOS != "" {
 		eas = append(eas, "goos="+g.GOOS)
@@ -69,7 +79,13 @@ func (g *GoProgDesc) Finalize(ops *GlobalOps) {
 		eas = append(eas, "goarch="+g.GOARCH)
 	}
 
-	target := g.AddTarget(g.TargetName, "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, g.TargetOptions)
+	tname := g.TargetName
+	if g.Mode == "module" {
+		tname += ".so"
+		// Buildmode plugin currently does not support cgo disabled.
+		eas = append(eas, "cgo_enabled=1")
+	}
+	target := g.AddTarget(tname, "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, g.TargetOptions)
 	AddGodeps(target, ops)
 	g.GeneralDesc.Finalize(ops)
 }
@@ -124,9 +140,20 @@ func (g *GoTestDesc) Finalize(ops *GlobalOps) {
 }
 
 var GoprogTemplate = GoProgDesc{
+	Mode: "prog",
 	LinkDesc: LinkDesc{
 		GeneralDesc: GeneralDesc{
 			Destdir:       "dest_bin",
+			TargetOptions: map[string]bool{"all": true, "incdeps": true, "libdeps": true},
+		},
+	},
+}
+
+var GomoduleTemplate = GoProgDesc{
+	Mode: "module",
+	LinkDesc: LinkDesc{
+		GeneralDesc: GeneralDesc{
+			Destdir:       "dest_mod",
 			TargetOptions: map[string]bool{"all": true, "incdeps": true, "libdeps": true},
 		},
 	},
