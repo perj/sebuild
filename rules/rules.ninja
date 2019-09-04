@@ -132,7 +132,7 @@ gobuild_tool=GOPATH="$gopath" GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$g
 rule gobuild
     command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$objdir/depfile-$gomode" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
     depfile = $objdir/depfile-$gomode
-    description = building go program $out from $in
+    description = building go $gomode $out from $in
 
 rule gobuildlib
     command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"

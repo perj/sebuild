@@ -4,7 +4,7 @@
 set -xe
 test -z "$BUILDPATH" && BUILDPATH=build
 
-CC='env cc' seb -condition cfoo -condition cbar
+CC="cc -std=gnu11" seb -condition cfoo -condition cbar
 touch Builddesc # to make ninja invoke seb.
 ninja -f $BUILDPATH/build.ninja
 
@@ -20,6 +20,9 @@ grep -q fooval $BUILDPATH/regress/regress/infile/infile
 grep -q rt0_386_darwin $BUILDPATH/regress/bin/goarch
 # Check prod flavor is executable.
 $BUILDPATH/prod/bin/goarch
+
+# Load the built go module.
+$BUILDPATH/regress/bin/loader $BUILDPATH/regress/modules/gomod.so
 
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gotest/gopath
 ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html
@@ -40,4 +43,4 @@ if ! (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage
 test -f $BUILDPATH/obj/regress/lib/enabled
 ! test -f $BUILDPATH/obj/regress/lib/disabled
 
-[ -n "$NODEPTEST" ] || CC='env cc' BUILDBUILD_ARGS="-condition cfoo -condition cbar" ../contrib/helpers/dep-tester.sh
+[ -n "$NODEPTEST" ] || CC="cc -std=gnu11" BUILDBUILD_ARGS="-condition cfoo -condition cbar" ../contrib/helpers/dep-tester.sh

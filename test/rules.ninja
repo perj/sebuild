@@ -1,7 +1,7 @@
 # Copyright 2018 Schibsted
 
 rule persist_cc
-    command = test "$cc" = "env cc" && touch $out
+    command = test "$cc" = "cc -std=gnu11" && touch $out
 
 rule test_zlib_config
     command = test -n "$zlib_config" && touch $out
