@@ -27,7 +27,7 @@ rule final_analyse
     command = $analyse_tool -final $out $in
     description = Final analyse in $out
 
-link_wrapper = $buildtooldir/internal/tools/link.pl
+link_wrapper = seb -tool link
 rule linkxx
     command = $link_wrapper $cxx $ldflags $ldopts $gcov_ldopts -L $libdir -L $scmcoord_contrib/lib -o $out @$out.rsp $ldlibs
     description = link $out
@@ -67,11 +67,11 @@ rule install_script
     description = copy $in to $out
 
 rule install_header
-    command = $buildtooldir/internal/tools/header-install.sh $in $out
+    command = seb -tool header-install $in $out
     description = copy header to $out
 
 rule install_py
-    command = $buildtooldir/internal/tools/python-install.sh $in $out
+    command = seb -tool python-install $in $out
     description = python copy $in to $out
 
 rule install_php
@@ -79,7 +79,7 @@ rule install_php
     description = php syntax check and copy $in to $out
 
 rule copy_go
-    command = $buildtooldir/internal/tools/go-install.sh $in $out
+    command = seb -tool go-install $in $out
     description = go fmt check and copy $in to $out
 
 rule concat
@@ -189,9 +189,8 @@ rule untar
     command = tar -x -O -f $in $file > $out || ( rm -f $out ; exit 1 )
     description= Untar $file from $in
 
-ronn_wrapper = $buildtooldir/internal/tools/ronn_wrapper.sh
 rule ronn
-    command = $ronn_wrapper $in $out
+    command = seb -tool ronn $in $out
     description = Generate man page using ronn
 
 # The following rules depend on variables that are defined in

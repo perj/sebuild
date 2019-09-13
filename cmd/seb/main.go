@@ -18,7 +18,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	go_install "github.com/schibsted/sebuild/internal/cmd/go-install"
 	"github.com/schibsted/sebuild/internal/cmd/gobuild"
+	header_install "github.com/schibsted/sebuild/internal/cmd/header-install"
+	"github.com/schibsted/sebuild/internal/cmd/link"
+	python_install "github.com/schibsted/sebuild/internal/cmd/python-install"
+	"github.com/schibsted/sebuild/internal/cmd/ronn"
 	"github.com/schibsted/sebuild/pkg/buildbuild"
 )
 
@@ -195,6 +200,16 @@ func mainTool() {
 	switch os.Args[2] {
 	case "gobuild":
 		gobuild.Main(os.Args[3:]...)
+	case "link":
+		link.Main(os.Args[3:]...)
+	case "go-install":
+		go_install.Main(os.Args[3:]...)
+	case "header-install":
+		header_install.Main(os.Args[3:]...)
+	case "python-install":
+		python_install.Main(os.Args[3:]...)
+	case "ronn":
+		ronn.Main(os.Args[3:]...)
 	}
 	os.Exit(0)
 }

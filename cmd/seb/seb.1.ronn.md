@@ -56,7 +56,9 @@ files refer to the documentation site, https://schibsted.github.io/sebuild
 `-tool` tool
 
   Invoke an internal tool. These are usually invoked by ninja and are not
-  considered stable. The current available tool is `gobuild`.
+  considered stable.
+  The current available tools are `go-install`, `gobuild`, `header-install`,
+  `link`, `python-install` and `ronn`.
   This flag can only be used as the first argument given to `seb`. The rest of
   the arguments are passed to the tool rather than parsed as seb or ninja
   flags.
