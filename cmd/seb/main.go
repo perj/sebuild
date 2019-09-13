@@ -6,7 +6,7 @@
 // information about this tool.
 package main
 
-//go:generate go-bindata -nomemcopy -ignore Builddesc -prefix ../../ ../../internal/... ../../rules/...
+//go:generate go-bindata -nomemcopy -ignore Builddesc -ignore cmd.*\.go$ -prefix ../../ ../../internal/... ../../rules/...
 
 import (
 	"bytes"
