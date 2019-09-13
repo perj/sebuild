@@ -105,12 +105,6 @@ rule gperf
 rule build_version
     command = echo \#define BUILD_VERSION \"$buildversion\" > $out
 
-rule swig_python
-    command=swig -python -threads -O -o $out $in
-
-rule swig_python_header
-    command=$buildtooldir/internal/tools/swig_header.sh $in $out -python -threads -O
-
 rule generate_ninjas
     command = BUILD_BUILD_FROM_NINJA=1 CC="$cc" BUILDTOOLDIR="$buildtooldir" $build_build
     generator=
