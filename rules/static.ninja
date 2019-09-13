@@ -11,4 +11,4 @@ build $incdir/build_version.h: install_conf $incdir/build_version_$buildversion.
 # Generate the variables for compiling .in files.
 # /dev/null dependency is primarily to rebuild in.conf in new docker images (with new IPs).
 inconf = $buildtools/in.conf
-build $inconf: inconfig $buildvars $configvars | $inconfig $intool /dev/null
+build $inconf: inconfig $buildvars $configvars | $inconfig /dev/null

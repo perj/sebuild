@@ -76,7 +76,7 @@ compiler[cc2]
 		CompilerFlavorRuleDir: "$buildtooldir/rules/compiler-flavor",
 		Ruledeps: map[string][]string{
 			"q":  []string{"qtool", "ztool", "xtool"},
-			"in": []string{"$inconf", "$intool", "$configvars"},
+			"in": []string{"$inconf", "$configvars"},
 		},
 		Buildvars:          []string{"foo2", "foo"},
 		Compiler:           []string{"cc", "cc2"},

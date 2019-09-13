@@ -50,7 +50,7 @@ import (
 //
 // ruledeps - Per-rule dependencies. Targets built with a certain rule will
 // depend on those additional target. In this example everything built with
-// the in rule will also depend on $inconf and $intool.
+// the in rule will also depend on $inconf.
 //
 // prefix:flavor - Set a prefix for the installed files for the specified
 // flavor. Must be flavored.
@@ -130,7 +130,7 @@ func (ops *GlobalOps) DefaultConfig() {
 		ops.Config.Conditions[runtime.GOARCH] = true
 	}
 
-	ops.Config.Ruledeps["in"] = []string{"$inconf", "$intool", "$configvars"}
+	ops.Config.Ruledeps["in"] = []string{"$inconf", "$configvars"}
 
 	ops.FlavorConfigs = make(map[string]*FlavorConfig)
 }

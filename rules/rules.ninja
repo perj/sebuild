@@ -191,9 +191,8 @@ rule ronn
 # toolrules.ninja. The reason for this is that they in turn
 # depend on paths defined by per-flavor ninja files.
 
-intool = $buildtooldir/internal/tools/in.pl
 rule in
-    command = $intool "$inconf" $in $out
+    command = seb -tool in "$inconf" $in $out
     restat=1
 
 rule inconfig

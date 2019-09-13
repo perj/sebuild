@@ -29,7 +29,7 @@ A config directive with large contents will look something like this.
 			scripts/build/static.ninja
 		]
 		ruledeps[
-			in:$inconf,$intool,$configvars
+			in:$inconf,$configvars
 		]
 		prefix:release[usr/local]
 		config_script[
@@ -190,12 +190,12 @@ This argument must be flavored, i.e. you have to use something like
 ## ruledeps
 Per-rule dependencies. Targets built with a certain rule will depend on those
 additional target. In this example everything built with `in` will also depend
-on `$inconf` and `$intool`.
+on `$inconf`.
 
 There exists some default ruledeps, entries you put here will add to those. The
 defaults are:
 
-* `in:$inconf,$intool,$configvars`
+* `in:$inconf,$configvars`
 
 ## rules
 A list of file names, relative paths.

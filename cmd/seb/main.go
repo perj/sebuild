@@ -21,6 +21,7 @@ import (
 	go_install "github.com/schibsted/sebuild/internal/cmd/go-install"
 	"github.com/schibsted/sebuild/internal/cmd/gobuild"
 	header_install "github.com/schibsted/sebuild/internal/cmd/header-install"
+	"github.com/schibsted/sebuild/internal/cmd/in"
 	"github.com/schibsted/sebuild/internal/cmd/link"
 	python_install "github.com/schibsted/sebuild/internal/cmd/python-install"
 	"github.com/schibsted/sebuild/internal/cmd/ronn"
@@ -210,6 +211,8 @@ func mainTool() {
 		python_install.Main(os.Args[3:]...)
 	case "ronn":
 		ronn.Main(os.Args[3:]...)
+	case "in":
+		in.Main(os.Args[3:]...)
 	}
 	os.Exit(0)
 }
