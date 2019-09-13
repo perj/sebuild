@@ -1,4 +1,4 @@
-// Copyright 2018 Schibsted
+// Copyright 2018-2019 Schibsted
 
 // Tool for compiling projects with ninja.
 //
@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/schibsted/sebuild/internal/cmd/gobuild"
 	"github.com/schibsted/sebuild/pkg/buildbuild"
 )
 
@@ -54,6 +55,9 @@ var (
 )
 
 func main() {
+	if len(os.Args) >= 3 && os.Args[1] == "-tool" {
+		mainTool()
+	}
 	ops := buildbuild.NewGlobalOps()
 	ops.BuildPlugin = BuildPlugin
 	flag.Usage = func() {
@@ -185,4 +189,12 @@ func installTools(quiet bool) {
 	if !quiet {
 		fmt.Printf("Seb tools installed to %s\n", dir)
 	}
+}
+
+func mainTool() {
+	switch os.Args[2] {
+	case "gobuild":
+		gobuild.Main(os.Args[3:]...)
+	}
+	os.Exit(0)
 }

@@ -122,39 +122,39 @@ pool gobuilds_lib
 pool gobuilds_piclib
     depth = 1
 
-# The gobuild script uses some environment variables. We allow these to be set
+# The gobuild tool uses some environment variables. We allow these to be set
 # in configvars ninja files. They will default to the normal environment
 # variables if not set there however.  This is for dependencies to work more
 # properly as configvars script changes retrigger builds but environment
 # variables do not.
-gobuild_tool=GOPATH="$gopath" GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$gobuild_test_flags CGO_ENABLED=$cgo_enabled $buildtooldir/internal/tools/gobuild.sh
+gobuild_tool=GOPATH="$gopath" GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$gobuild_test_flags CGO_ENABLED=$cgo_enabled seb -tool gobuild
 
 rule gobuild
-    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$objdir/depfile-$gomode" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
+    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=$gomode -pkgdir="$builddir" "$in" "$out" "$objdir/depfile-$gomode"
     depfile = $objdir/depfile-$gomode
     description = building go $gomode $out from $in
 
 rule gobuildlib
-    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool "$gopkg" "$in" "$out" "$depfile" "$picflag -I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" $gomode "$builddir"
+    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="$picflag -I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=$gomode -pkgdir="$builddir" "$in" "$out" "$depfile"
     depfile = $depfile
     description = building go library $out from $in
     pool = gobuilds_$gomode
 
 rule gotest
-    command = $gobuild_tool "$gopkg" "$in" "" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" test "$builddir"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=test -pkgdir="$builddir" "$in"
     description = testing go package in $in
 
 rule gobench
-    command = $gobuild_tool "$gopkg" "$in" "" "$benchflags" "-I $incdir $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" bench "$builddir"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=bench -pkgdir="$builddir" "$in" "$benchflags"
     description = benching go package in $in
 
 rule gocover
-    command = $gobuild_tool "$gopkg" "$in" "$out" "$objdir/depfile-cover" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover "$builddir"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=cover -pkgdir="$builddir" "$in" "$out" "$objdir/depfile-cover"
     depfile = $objdir/depfile-cover
     description = testing coverage of go package in $in
 
 rule gocover_html
-    command = $gobuild_tool "$gopkg" "$in" "$out" "" "-I $incdir $includes $platform_includes" "-L $libdir -L $scmcoord_contrib/lib $ldlibs" cover_html "$builddir"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=cover_html -pkgdir="$builddir" "$in" "$out"
     description = coverage to html of go package in $in
 
 rule goaddmain
