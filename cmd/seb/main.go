@@ -1,4 +1,4 @@
-// Copyright 2018 Schibsted
+// Copyright 2018-2019 Schibsted
 
 // Tool for compiling projects with ninja.
 //
@@ -6,7 +6,7 @@
 // information about this tool.
 package main
 
-//go:generate go-bindata -nomemcopy -ignore Builddesc -prefix ../../ ../../internal/... ../../rules/...
+//go:generate go-bindata -nomemcopy -ignore Builddesc -ignore cmd.*\.go$ -prefix ../../ ../../internal/... ../../rules/...
 
 import (
 	"bytes"
@@ -18,6 +18,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	go_install "github.com/schibsted/sebuild/internal/cmd/go-install"
+	"github.com/schibsted/sebuild/internal/cmd/gobuild"
+	header_install "github.com/schibsted/sebuild/internal/cmd/header-install"
+	"github.com/schibsted/sebuild/internal/cmd/in"
+	"github.com/schibsted/sebuild/internal/cmd/link"
+	python_install "github.com/schibsted/sebuild/internal/cmd/python-install"
+	"github.com/schibsted/sebuild/internal/cmd/ronn"
 	"github.com/schibsted/sebuild/pkg/buildbuild"
 )
 
@@ -54,6 +61,9 @@ var (
 )
 
 func main() {
+	if len(os.Args) >= 3 && os.Args[1] == "-tool" {
+		mainTool()
+	}
 	ops := buildbuild.NewGlobalOps()
 	ops.BuildPlugin = BuildPlugin
 	flag.Usage = func() {
@@ -185,4 +195,27 @@ func installTools(quiet bool) {
 	if !quiet {
 		fmt.Printf("Seb tools installed to %s\n", dir)
 	}
+}
+
+func mainTool() {
+	switch os.Args[2] {
+	case "gobuild":
+		gobuild.Main(os.Args[3:]...)
+	case "link":
+		link.Main(os.Args[3:]...)
+	case "go-install":
+		go_install.Main(os.Args[3:]...)
+	case "header-install":
+		header_install.Main(os.Args[3:]...)
+	case "python-install":
+		python_install.Main(os.Args[3:]...)
+	case "ronn":
+		ronn.Main(os.Args[3:]...)
+	case "in":
+		in.Main(os.Args[3:]...)
+	default:
+		fmt.Fprintf(os.Stderr, "Unknown tool %q.\n", os.Args[2])
+		os.Exit(1)
+	}
+	os.Exit(0)
 }
