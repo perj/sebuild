@@ -20,6 +20,8 @@ type Target struct {
 	CollectAs string
 
 	IncdepsExcept map[string]bool
+
+	MultiTarget []string // A single build generating multiple targets.
 }
 
 var (
@@ -35,44 +37,7 @@ func (desc *GeneralDesc) AddTarget(tname, rule string, srcs []string, destdir, s
 	}
 
 	if desc.Targets[tname] != nil {
-		// First we have to make sure that no target has already been renamed according
-		// to the rules below. If there was and we have three targets with the same
-		// name we can't resolve that. Rename your intermediate files.
-		tmpname := "TMP_BUILD" + tname
-		if desc.Targets[tmpname] != nil {
-			panic(&ParseError{MultipleDefinedTarget, tname, desc.Builddesc})
-		}
-
-		if strings.HasPrefix(rule, "install") {
-			// If our rule is install, we need to rename the old target so that
-			// all dependencies are on us.
-			for idx, src := range srcs {
-				if src == tname {
-					srcs[idx] = tmpname
-				}
-			}
-
-			desc.Targets[tmpname] = desc.Targets[tname]
-			delete(desc.Targets, tname)
-			desc.Srcdirs[tmpname] = desc.Srcdirs[tname]
-			delete(desc.Srcdirs, tname)
-			desc.Deps[tmpname] = desc.Deps[tname]
-			delete(desc.Deps, tname)
-			desc.Srcopts[tmpname] = desc.Srcopts[tname]
-			delete(desc.Srcopts, tname)
-		} else if strings.HasPrefix(desc.Targets[tname].Rule, "install") {
-			// if the already defined rule is install, we can change our
-			// name since no one will depend on us having the right name.
-			for idx, src := range desc.Targets[tname].Sources {
-				if src == tname {
-					desc.Targets[tname].Sources[idx] = tmpname
-				}
-			}
-			tname = tmpname
-		} else {
-			// If neither of the targets are install, we can't handle it.
-			panic(&ParseError{MultipleDefinedTarget, tname, desc.Builddesc})
-		}
+		tname = desc.renameTarget(tname, rule, srcs)
 	}
 
 	eas := append([]string(nil), extraargs...)
@@ -93,6 +58,71 @@ func (desc *GeneralDesc) AddTarget(tname, rule string, srcs []string, destdir, s
 		desc.Srcdirs[src] = srcdir
 	}
 	return target
+}
+
+func (desc *GeneralDesc) renameTarget(tname, rule string, srcs []string) string {
+	// First we have to make sure that no target has already been renamed according
+	// to the rules below. If there was and we have three targets with the same
+	// name we can't resolve that. Rename your intermediate files.
+	tmpname := "TMP_BUILD" + tname
+	if desc.Targets[tmpname] != nil {
+		panic(&ParseError{MultipleDefinedTarget, tname, desc.Builddesc})
+	}
+
+	if strings.HasPrefix(rule, "install") {
+		// If our rule is install, we need to rename the old target so that
+		// all dependencies are on us.
+		for idx, src := range srcs {
+			if src == tname {
+				srcs[idx] = tmpname
+			}
+		}
+
+		prevtgt := desc.Targets[tname]
+		desc.Targets[tmpname] = prevtgt
+		if len(prevtgt.MultiTarget) > 0 {
+			for idx, t := range prevtgt.MultiTarget {
+				if t == tname {
+					prevtgt.MultiTarget[idx] = tmpname
+					break
+				}
+			}
+		}
+		delete(desc.Targets, tname)
+		desc.Srcdirs[tmpname] = desc.Srcdirs[tname]
+		delete(desc.Srcdirs, tname)
+		desc.Deps[tmpname] = desc.Deps[tname]
+		delete(desc.Deps, tname)
+		desc.Srcopts[tmpname] = desc.Srcopts[tname]
+		delete(desc.Srcopts, tname)
+		return tname
+	}
+
+	if strings.HasPrefix(desc.Targets[tname].Rule, "install") {
+		// if the already defined rule is install, we can change our
+		// name since no one will depend on us having the right name.
+		for idx, src := range desc.Targets[tname].Sources {
+			if src == tname {
+				desc.Targets[tname].Sources[idx] = tmpname
+			}
+		}
+		return tmpname
+	}
+
+	// If neither of the targets are install, we can't handle it.
+	panic(&ParseError{MultipleDefinedTarget, tname, desc.Builddesc})
+}
+
+func (g *GeneralDesc) AddMultiTarget(tnames []string, tgt *Target) {
+	tgt.MultiTarget = tnames
+	for idx, tname := range tnames {
+		prevtgt := g.Targets[tname]
+		if prevtgt != nil && prevtgt != tgt {
+			tname = g.renameTarget(tname, tgt.Rule, tgt.Sources)
+			tnames[idx] = tname
+		}
+		g.Targets[tname] = tgt
+	}
 }
 
 func (g *GeneralDesc) AllTargets() map[string]*Target {

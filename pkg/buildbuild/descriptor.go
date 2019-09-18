@@ -46,6 +46,7 @@ type Descriptor interface {
 	CompileSrc(srcdir, src, srcbase, ext string)
 
 	AddTarget(tname, rule string, srcs []string, destdir, srcdir string, extraargs []string, options map[string]bool) *Target
+	AddMultiTarget(tnames []string, target *Target)
 	AllTargets() map[string]*Target
 
 	ResolveSrcs(ops *GlobalOps, tname string, srcs ...string) []string

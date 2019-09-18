@@ -30,11 +30,23 @@ func (ops *GlobalOps) DefaultCompiler() {
 }
 
 // This is like AddTarget, but allow plugins to intercept in case they do some special processing.
+// It also splits tname on comma and sets a multi target if more than one element.
 func CompileSpecial(desc Descriptor, tname, rule string, srcs []string, destdir, srcdir string, extraargs []string, options map[string]bool) Descriptor {
+	if len(srcs) == 1 && srcs[0] == "" {
+		if options == nil {
+			options = make(map[string]bool)
+		}
+		options["emptysrcs"] = true
+		srcs = nil
+	}
 	if f := PluginSpecialSrcs[rule]; f != nil {
 		return f(desc, tname, rule, srcs, destdir, srcdir, extraargs, options)
 	}
-	desc.AddTarget(tname, rule, srcs, destdir, srcdir, extraargs, options)
+	tnames := strings.Split(tname, ",")
+	target := desc.AddTarget(tnames[0], rule, srcs, destdir, srcdir, extraargs, options)
+	if len(tnames) > 1 {
+		desc.AddMultiTarget(tnames, target)
+	}
 	return desc
 }
 
