@@ -18,6 +18,10 @@ up and do anything with the output from the script. You will need to specify
 additional arguments that use the output somehow, usually with
 [conf](../descriptors/install.md#conf) or [srcs](srcs.md).
 
+The target can also be a comma separated list. In that case a single command
+run should generate all the target files. The `$out` variable will have
+all the output files in it, in the same order.
+
 ## Special Commands
 
 Plugins are allowed to hijack specialsrcs by redirecting any specific commands

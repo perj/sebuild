@@ -34,3 +34,10 @@ INSTALL(/regress/infile
 	conf[infile]
 	srcs[infile.in]
 )
+
+INSTALL(/regress/multitgt
+	conf[a b c]
+	specialsrcs[
+		check_order::a,b,c
+	]
+)

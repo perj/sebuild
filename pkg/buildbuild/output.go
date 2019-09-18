@@ -390,7 +390,9 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 
 	desc.OutputHeader(w, objdir)
 
-	for tname, target := range desc.AllTargets() {
+	multiTargets := make(map[string]bool)
+	alltargets := desc.AllTargets()
+	for tname, target := range alltargets {
 		deps := desc.ResolveDeps(ops, tname)
 
 		if len(target.Sources) == 0 && len(deps) == 0 && !target.Options["emptysrcs"] {
@@ -399,6 +401,18 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 
 		rule := target.Rule
 		dest := path.Join(target.ResolveDest(), tname)
+		if len(target.MultiTarget) > 0 {
+			// Check already processed.
+			if multiTargets[tname] {
+				continue
+			}
+			dests := make([]string, len(target.MultiTarget))
+			for i, t := range target.MultiTarget {
+				multiTargets[t] = true
+				dests[i] = path.Join(target.ResolveDest(), t)
+			}
+			dest = strings.Join(dests, " ")
+		}
 		orderDeps := desc.ResolveOrderDeps(target)
 		srcs := desc.ResolveSrcs(ops, tname, target.Sources...)
 

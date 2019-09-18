@@ -13,3 +13,6 @@ depend_rule_echo_names=/dev/null
 rule echo_other
     command = for a in $other ; do echo $$a ; done | LANG=C sort > $out
 depend_rule_echo_names=/dev/null
+
+rule check_order
+    command = for f in $out ; do printf "%s\n" $out > $$f ; bash -c "diff -q <(sort $$f) $$f" ; done
