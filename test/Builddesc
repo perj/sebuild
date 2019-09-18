@@ -30,6 +30,13 @@ FOO(disabled
 	foos[foo.foo]
 )
 
+INSTALL(/regress
+	conf[touchtest]
+	specialsrcs[
+		touch_plus5:$buildpath/stamp:touchtest
+	]
+)
+
 INSTALL(/regress/infile
 	conf[infile]
 	srcs[infile.in]

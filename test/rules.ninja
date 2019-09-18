@@ -13,3 +13,6 @@ depend_rule_echo_names=/dev/null
 rule echo_other
     command = for a in $other ; do echo $$a ; done | LANG=C sort > $out
 depend_rule_echo_names=/dev/null
+
+rule touch_plus5
+    command = seb -tool touch -offset 5s $out

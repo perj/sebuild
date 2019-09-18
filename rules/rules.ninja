@@ -59,11 +59,11 @@ rule yaccxx
     description = yacc $out
 
 rule install_conf
-    command = install -m0644 $in $out
+    command = install -p -m0644 $in $out
     description = copy $in to $out
 
 rule install_script
-    command = install -m0755 $in $out
+    command = install -p -m0755 $in $out
     description = copy $in to $out
 
 rule install_header
