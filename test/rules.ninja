@@ -16,3 +16,6 @@ depend_rule_echo_names=/dev/null
 
 rule check_order
     command = for f in $out ; do printf "%s\n" $out > $$f ; bash -c "diff -q <(sort $$f) $$f" ; done
+
+rule touch_plus5
+    command = seb -tool touch -offset 5s $out

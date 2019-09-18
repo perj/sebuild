@@ -25,6 +25,7 @@ import (
 	"github.com/schibsted/sebuild/internal/cmd/link"
 	python_install "github.com/schibsted/sebuild/internal/cmd/python-install"
 	"github.com/schibsted/sebuild/internal/cmd/ronn"
+	"github.com/schibsted/sebuild/internal/cmd/touch"
 	"github.com/schibsted/sebuild/pkg/buildbuild"
 )
 
@@ -143,7 +144,7 @@ func main() {
 			if err != nil {
 				return nil
 			}
-			return RunNinja(ninja, bnpath)
+			return RunNinja(ninja, ops.Config.Buildpath)
 		}
 	}
 
@@ -176,8 +177,7 @@ func main() {
 		return
 	}
 
-	bnpath := filepath.Join(ops.Config.Buildpath, "build.ninja")
-	log.Fatal(RunNinja("", bnpath))
+	log.Fatal(RunNinja("", ops.Config.Buildpath))
 }
 
 func installTools(quiet bool) {
@@ -213,6 +213,8 @@ func mainTool() {
 		ronn.Main(os.Args[3:]...)
 	case "in":
 		in.Main(os.Args[3:]...)
+	case "touch":
+		touch.Main(os.Args[3:]...)
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown tool %q.\n", os.Args[2])
 		os.Exit(1)

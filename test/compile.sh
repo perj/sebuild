@@ -43,4 +43,9 @@ if ! (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage
 test -f $BUILDPATH/obj/regress/lib/enabled
 ! test -f $BUILDPATH/obj/regress/lib/disabled
 
+# Test touching in future
+seb $BUILDPATH/regress/regress/touchtest
+sleep 1 # Bump stamp source.
+seb $BUILDPATH/regress/regress/touchtest | grep -q 'no work to do'
+
 [ -n "$NODEPTEST" ] || CC="cc -std=gnu11" BUILDBUILD_ARGS="-condition cfoo -condition cbar" ../contrib/helpers/dep-tester.sh
