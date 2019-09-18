@@ -213,6 +213,9 @@ func mainTool() {
 		ronn.Main(os.Args[3:]...)
 	case "in":
 		in.Main(os.Args[3:]...)
+	default:
+		fmt.Fprintf(os.Stderr, "Unknown tool %q.\n", os.Args[2])
+		os.Exit(1)
 	}
 	os.Exit(0)
 }

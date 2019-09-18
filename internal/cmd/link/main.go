@@ -1,6 +1,6 @@
 // Copyright 2019 Schibsted
 
-// Packge link is a wrapper will parse rsp files for non-GNU ld versions.  GNU
+// Package link is a wrapper will parse rsp files for non-GNU ld versions.  GNU
 // ld supports them natively and we just exec it if we detect GNU.
 package link
 

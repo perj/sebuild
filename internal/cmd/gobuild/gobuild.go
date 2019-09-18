@@ -108,6 +108,7 @@ func Main(args ...string) {
 			extldflags.WriteString(" ")
 		}
 		extldflags.WriteString(os.Getenv("CGO_LDFLAGS"))
+		extldflags.WriteRune('"')
 		ldflags = append(ldflags, "-ldflags", extldflags.String())
 	}
 
