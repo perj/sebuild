@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	copy_analyse "github.com/schibsted/sebuild/internal/cmd/copy-analyse"
 	go_install "github.com/schibsted/sebuild/internal/cmd/go-install"
 	"github.com/schibsted/sebuild/internal/cmd/gobuild"
 	gperf_enum "github.com/schibsted/sebuild/internal/cmd/gperf-enum"
@@ -218,6 +219,8 @@ func mainTool() {
 		touch.Main(os.Args[3:]...)
 	case "gperf-enum":
 		gperf_enum.Main(os.Args[3:]...)
+	case "copy-analyse":
+		copy_analyse.Main(os.Args[3:]...)
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown tool %q.\n", os.Args[2])
 		os.Exit(1)

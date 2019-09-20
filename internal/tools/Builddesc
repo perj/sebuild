@@ -1,5 +1,0 @@
-INSTALL(share/seb/internal/tools
-	scripts[
-		*.pl
-	]
-)
