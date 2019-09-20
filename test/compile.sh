@@ -21,6 +21,8 @@ grep -q rt0_386_darwin $BUILDPATH/regress/bin/goarch
 # Check prod flavor is executable.
 $BUILDPATH/prod/bin/goarch
 
+$BUILDPATH/regress/bin/build_ctest
+
 # Load the built go module.
 $BUILDPATH/regress/bin/loader $BUILDPATH/regress/modules/gomod.so
 

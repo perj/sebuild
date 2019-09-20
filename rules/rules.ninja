@@ -89,13 +89,12 @@ rule concat
 rule touch
     command = touch $out
 
-gperf_enum = $buildtooldir/internal/tools/gperf_enum.pl
 rule gperf_enum
-    command = $gperf_enum $out $in
+    command = seb -tool gperf-enum enum $in $out
     description = gperf_enum $out
 
 rule gperf_switch
-    command = $gperf_enum -s $out $in
+    command = seb -tool gperf-enum source $in $out
     description = gperf_enum $out
 
 rule gperf

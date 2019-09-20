@@ -1,5 +1,11 @@
-# Copyright 2018 Schibsted
+# Copyright 2018-2019 Schibsted
 
 PROG(build_ctest
-	srcs[build_ctest.c]
+	srcs[
+		*.c
+		foo.gperf
+	]
+	specialsrcs[
+		gperf_switch:gperf_switch.c:foo.gperf
+	]
 )
