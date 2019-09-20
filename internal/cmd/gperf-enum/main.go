@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"go/token"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -21,6 +20,16 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s -tool gperf-enum <mode> <src> <gperf-file>\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "\nMode is either enum or source.\n")
 	os.Exit(1)
+}
+
+func isIdentifier(name string) bool {
+	for i, ch := range name {
+		if unicode.IsLetter(ch) || ch == '_' || i > 0 && unicode.IsDigit(ch) {
+			continue
+		}
+		return false
+	}
+	return len(name) > 0
 }
 
 func Main(args ...string) {
@@ -45,7 +54,7 @@ func Main(args ...string) {
 		os.Exit(1)
 	}
 	name := strings.TrimSuffix(outname, ext)
-	if !token.IsIdentifier(name) {
+	if !isIdentifier(name) {
 		fmt.Fprintf(os.Stderr, "Gperf file base must be a valid identifier.\n")
 		os.Exit(1)
 	}
