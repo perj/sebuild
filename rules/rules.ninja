@@ -18,13 +18,12 @@ rule cc_analyse
     command = rm -rf $out ; mkdir -p $out ; clang $analyser_flags $picflag $flavor_cflags $cflags $conlyflags $cwarnflags $gcov_copts $copts $srcopts -I. -I$incdir $includes $defines $in -o $out
     description = C analyse $out
 
-analyse_tool = $buildtooldir/internal/tools/copy_analyse.pl
 rule copy_analyse
-    command = $analyse_tool $out $in
+    command = seb -tool copy-analyse $out $in
     description = Copy analyse to $out
 
 rule final_analyse
-    command = $analyse_tool -final $out $in
+    command = seb -tool copy-analyse -finalize $out $in
     description = Final analyse in $out
 
 link_wrapper = seb -tool link
@@ -89,13 +88,12 @@ rule concat
 rule touch
     command = touch $out
 
-gperf_enum = $buildtooldir/internal/tools/gperf_enum.pl
 rule gperf_enum
-    command = $gperf_enum $out $in
+    command = seb -tool gperf-enum enum $in $out
     description = gperf_enum $out
 
 rule gperf_switch
-    command = $gperf_enum -s $out $in
+    command = seb -tool gperf-enum source $in $out
     description = gperf_enum $out
 
 rule gperf

@@ -7,6 +7,7 @@ addons:
   apt:
     packages:
     - ninja-build
+    - gperf
 
 install:
 - gem install ronn
