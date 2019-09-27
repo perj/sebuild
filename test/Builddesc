@@ -48,3 +48,7 @@ INSTALL(/regress/multitgt
 		check_order::a,b,c
 	]
 )
+
+GOPROG(test-remote
+	gopkg[github.com/schibsted/sebuild/cmd/seb]
+)

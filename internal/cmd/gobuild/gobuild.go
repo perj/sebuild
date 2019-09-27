@@ -56,8 +56,7 @@ func Main(args ...string) {
 	outpath = flagset.Arg(1)
 	depfile = flagset.Arg(2)
 	if inpath == "" {
-		flagset.Usage()
-		os.Exit(2)
+		inpath = "."
 	}
 	if outpath == "" && needOutpath(*mode) {
 		flagset.Usage()
