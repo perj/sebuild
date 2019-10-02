@@ -1,16 +1,9 @@
-#!/usr/bin/env bash
-# Copyright 2018 Schibsted
+// Copyright 2018-2019 Schibsted
 
-if [ $# -lt 1 ] ; then
-	echo "Must specify buildvars as argument." >&2
-	exit 1;
-fi
+package assets
 
+const InvarsSh = `
 set -e
-
-for f in "$@"; do
-	. $f
-done
 
 if [ "$(command -v setval)" != "setval" ]; then
 	setval() {
@@ -34,7 +27,7 @@ if [ "$(command -v depend)" != "depend" ]; then
 	fi
 fi
 
-setval BUILD_STAGE `echo $buildflavor | tr [:lower:] [:upper:]`
+setval BUILD_STAGE $(echo $buildflavor | tr [:lower:] [:upper:])
 
 oldifs="$IFS"
 IFS=":"
@@ -50,3 +43,4 @@ IFS="$oldifs"
 
 setval GOARCH $(go env GOARCH 2>/dev/null)
 setval GOOS $(go env GOOS 2>/dev/null)
+`

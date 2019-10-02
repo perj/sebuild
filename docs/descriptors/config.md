@@ -6,7 +6,7 @@ be first in the first Builddesc or not at all.
 
 Sebuild is meant to have sane defaults and perhaps you will not need a
 CONFIG directive at all, its entire contents is optional. The most common
-options to add are `configvars`, `config_script` and `flavors`.
+options to add are `invars`, `config_script` and `flavors`.
 
 A config directive with large contents will look something like this.
 
@@ -34,6 +34,9 @@ A config directive with large contents will look something like this.
 		prefix:release[usr/local]
 		config_script[
 			sebuild/config_script.sh
+		]
+		invars[
+			scripts/build/invars.sh
 		]
 	)
 
@@ -130,10 +133,39 @@ A list of file names, relative paths.
 The files should contain global ninja variables. This can be used to set some
 ninja variables such as the default gopath. Passed to invars.sh to also
 generate variables there, must thus contain only variable assignments, no
-rules.
+rules, as it has to be parsable by bash as well.
 
 Some descriptors and source types will parse some configvars values specially.
 These are mentioned in respective document.
+
+## invars
+A list of file names, relative paths.
+
+These scripts are invoked if you have any in-files in your
+[srcs](../arguments/srcs.md).  Before run, the flavored `buildvars.ninja`, all
+the configvars files and the builtin invars script are all included. The
+builtin invars script defines two functions:
+
+* setval can be used to set values. They'll both be printed and set as script
+  variables.
+* depend can be used to add dependencies on files, such that the invars script
+  is re-run if they change. A trick to detect some changes such as an IP
+  change is to add `depend /dev/null`. You should also depend on any scripts
+  you include etc.
+
+In previous versions this was instead set in `configvars` using the `inconfig`
+variable. That still works and overrides the value set here so make sure you
+haven't done that if you use this parameter.
+
+## builtin_invars
+A file name, relative path.
+
+Can be used to override the builtin invars script. Should be used sparingly as
+it might change even in patch versions. If not used the `SEBUILD_INVARS_SH`
+environment variable is also checked before the default builtin one is used.
+
+New variables might be added to the builtin script without it being considered
+a breaking change.
 
 ## extravars
 A list of file names, relative paths.

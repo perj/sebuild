@@ -180,7 +180,12 @@ func (ops *GlobalOps) OutputTop() (err error) {
 
 	fmt.Fprintf(w, "build_build = %s\n", BuildBuildArgs(os.Args))
 	fmt.Fprintf(w, "buildtooldir=%s\n", BuildtoolDir())
-	fmt.Fprintf(w, "inconfig = $buildtooldir/scripts/invars.sh\n")
+	fmt.Fprintf(w, "builtin_invars = %s\n", ops.Config.BuiltinInvars)
+	iv := strings.TrimSpace(strings.Join(ops.Config.Invars, " "))
+	if iv == "" {
+		iv = "/dev/null"
+	}
+	fmt.Fprintf(w, "inconfig = %s\n", iv)
 	cv := strings.TrimSpace(strings.Join(ops.Config.Configvars, " "))
 	if cv == "" {
 		cv = "/dev/null"

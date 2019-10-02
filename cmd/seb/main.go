@@ -24,6 +24,7 @@ import (
 	gperf_enum "github.com/schibsted/sebuild/internal/cmd/gperf-enum"
 	header_install "github.com/schibsted/sebuild/internal/cmd/header-install"
 	"github.com/schibsted/sebuild/internal/cmd/in"
+	"github.com/schibsted/sebuild/internal/cmd/invars"
 	"github.com/schibsted/sebuild/internal/cmd/link"
 	python_install "github.com/schibsted/sebuild/internal/cmd/python-install"
 	"github.com/schibsted/sebuild/internal/cmd/ronn"
@@ -221,6 +222,8 @@ func mainTool() {
 		gperf_enum.Main(os.Args[3:]...)
 	case "copy-analyse":
 		copy_analyse.Main(os.Args[3:]...)
+	case "invars":
+		invars.Main(os.Args[3:]...)
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown tool %q.\n", os.Args[2])
 		os.Exit(1)
