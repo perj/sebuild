@@ -42,3 +42,18 @@ third party sources and you won't modify it regardless. Use with an empty
 value.
 
     no_analyse[]
+
+## go_noinit
+
+If this is used together with Go files in [srcs](srcs.md) the Go runtime won't
+be initialized automatically. This is needed if you have code that forks during
+startup as the Go runtime can't survive forks.
+
+If using this you must manually load the Go runtime before calling any Go
+functions. To do that call the symbol named like this as a function
+taking argc, argv and environ:
+
+	echo _rt0_`go env GOARCH`_`go env GOOS`_lib
+
+The sister-project [sebase](https://github.com/schibsted/sebase) has a wrapper
+called `init_go_runtime` for making this more convenient.

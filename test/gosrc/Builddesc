@@ -4,10 +4,24 @@ PROG(gosrc_test
 	srcs[
 		main.c
 		gosrc.go
+	]
+	libs[
+		pthread
+	]
+)
+
+PROG(gosrc_test_noinit
+	srcopts[
+		main.c:-DINIT_GO
+	]
+	srcs[
+		main.c
+		gosrc.go
 		goinit.c.in
 		goinit.c
 	]
 	libs[
 		pthread
 	]
+	go_noinit[]
 )

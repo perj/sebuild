@@ -23,6 +23,7 @@ $BUILDPATH/prod/bin/goarch
 
 $BUILDPATH/regress/bin/build_ctest
 $BUILDPATH/regress/bin/gosrc_test
+$BUILDPATH/regress/bin/gosrc_test_noinit
 
 # Load the built go module.
 $BUILDPATH/regress/bin/loader $BUILDPATH/regress/modules/gomod.so

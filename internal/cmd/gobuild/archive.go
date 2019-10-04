@@ -26,14 +26,14 @@ func buildCArchive(mode string, ldflags []string) {
 		executeWithLdFlagsAndPkg(ldflags, "go", "build", "-i", "-pkgdir", abspkgdir+"/gopkg_lib", "-installsuffix=lib", "-buildmode=c-archive", "-o", absout)
 	}
 
-	// If there weren't any exports the header won't be created, but we expected it to be there.
+	// If there weren't any exports the header won't be created, but we expect it to be there.
 	header := strings.TrimSuffix(absout, ".a") + ".h"
 	f, _ := os.OpenFile(header, os.O_WRONLY|os.O_CREATE, 0666)
 	if f != nil {
 		f.Close()
 	}
 
-	if runtime.GOOS != "darwin" {
+	if *libNoInit && runtime.GOOS != "darwin" {
 		// Try to disable auto-start of go runtime. We want to be able to fork.
 		// Don't know how to do it on Darwin right now.
 		symbol := "_rt0_" + runtime.GOARCH + "_" + runtime.GOOS + "_lib"
