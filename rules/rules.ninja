@@ -150,7 +150,7 @@ rule gocover_html
     description = coverage to html of go package in $in
 
 rule goaddmain
-    command = install -m644 "$in" "$out"
+    command = seb -tool asset -out "$out" main.go
     description = setup go main package $out
 
 rule symlink

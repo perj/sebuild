@@ -133,7 +133,8 @@ func (l *LinkDesc) FinalizeGoSrcs(ops *GlobalOps, mode string) []string {
 		return nil
 	}
 
-	l.AddTarget("go/main.go", "goaddmain", []string{"$buildtooldir/internal/assets/main.go"}, "objdir", "", nil, nil)
+	options := map[string]bool{"emptysrcs": true}
+	l.AddTarget("go/main.go", "goaddmain", nil, "objdir", "", nil, options)
 	l.AddTarget("go", "phony", []string{"go/main.go"}, "objdir", "", nil, nil)
 
 	eas := []string{"depfile=$objdir/go/depfile", "gomode=" + mode}

@@ -1,0 +1,13 @@
+# Copyright 2019 Schibsted
+
+PROG(gosrc_test
+	srcs[
+		main.c
+		gosrc.go
+		goinit.c.in
+		goinit.c
+	]
+	libs[
+		pthread
+	]
+)

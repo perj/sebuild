@@ -22,6 +22,7 @@ grep -q rt0_386_darwin $BUILDPATH/regress/bin/goarch
 $BUILDPATH/prod/bin/goarch
 
 $BUILDPATH/regress/bin/build_ctest
+$BUILDPATH/regress/bin/gosrc_test
 
 # Load the built go module.
 $BUILDPATH/regress/bin/loader $BUILDPATH/regress/modules/gomod.so

@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	cmdasset "github.com/schibsted/sebuild/internal/cmd/asset"
 	copy_analyse "github.com/schibsted/sebuild/internal/cmd/copy-analyse"
 	go_install "github.com/schibsted/sebuild/internal/cmd/go-install"
 	"github.com/schibsted/sebuild/internal/cmd/gobuild"
@@ -224,6 +225,8 @@ func mainTool() {
 		copy_analyse.Main(os.Args[3:]...)
 	case "invars":
 		invars.Main(os.Args[3:]...)
+	case "asset":
+		cmdasset.Main(os.Args[3:]...)
 	default:
 		fmt.Fprintf(os.Stderr, "Unknown tool %q.\n", os.Args[2])
 		os.Exit(1)
