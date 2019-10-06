@@ -130,6 +130,8 @@ func (ops *GlobalOps) FindCompilerCC() error {
 
 	ops.CompilerFlavor = ""
 
+	minGcc := comparableVersion("4.8")
+	minClang := comparableVersion("3.4")
 	versionRE := regexp.MustCompile(`(\S+) version ([0-9]+\.[0-9]+)`)
 	for _, cc := range candidates {
 		minv := ""
@@ -153,15 +155,15 @@ func (ops *GlobalOps) FindCompilerCC() error {
 		}
 
 		c := match[1]
-		v := match[2]
+		v := comparableVersion(match[2])
 
-		if minv != "" && v < minv {
+		if minv != "" && v < comparableVersion(minv) {
 			continue
 		}
-		if c == "gcc" && v < "4.8" {
+		if c == "gcc" && v < minGcc {
 			continue
 		}
-		if c == "clang" && v < "3.4" {
+		if c == "clang" && v < minClang {
 			continue
 		}
 
@@ -187,6 +189,14 @@ func (ops *GlobalOps) FindCompilerCC() error {
 		return errors.New("Couldn't find a compatible compiler")
 	}
 	return nil
+}
+
+func comparableVersion(v string) string {
+	var vlong strings.Builder
+	for _, vpart := range strings.Split(v, ".") {
+		fmt.Fprintf(&vlong, "%4s", vpart)
+	}
+	return vlong.String()
 }
 
 func (l *LinkDesc) CompileC(srcdir, src, srcbase string) {
