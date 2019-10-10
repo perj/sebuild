@@ -68,17 +68,6 @@ The Go package(s) have access to all local headers for the C program.
 Several restrictions apply to what functions can be exported, see
 `go doc cmd/cgo`.
 
-The Go runtime stops working when a process forks, and can't be reinitialized.
-To workaround this in programs that fork at launch, the automatic loading of
-the Go runtime at program initialization has been disabled. Instead you must
-manually load it. To do that call the symbol names like this as a function
-taking argc, argv and environ:
-
-	echo _rt0_`go env GOARCH`_`go env GOOS`_lib
-
-(this disabling the autostart of Go runtime should probably not be enabled by
-default.)
-
 ## Gperf Sources
 
 These are compiled with gperf to generate header files. The flag `-L ANSI-C`

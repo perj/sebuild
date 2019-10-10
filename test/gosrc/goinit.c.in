@@ -1,0 +1,17 @@
+// Copyright 2018-2019 Schibsted
+
+#define GO_INIT_LIB_SYMBOL _rt0_%GOARCH%_%GOOS%_lib
+extern void GO_INIT_LIB_SYMBOL(int argc, char *const*argv, char **environ);
+extern void _cgo_wait_runtime_init_done(void);
+extern char **environ;
+
+void init_go_runtime(int argc, char *const *argv);
+
+void
+init_go_runtime(int argc, char *const *argv) {
+#ifndef __APPLE__
+	// OS X don't need this as Go runtime isn't disabled.
+	GO_INIT_LIB_SYMBOL(argc, argv, environ);
+	_cgo_wait_runtime_init_done();
+#endif
+}

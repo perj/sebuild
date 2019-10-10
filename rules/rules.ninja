@@ -127,7 +127,7 @@ rule gobuild
     description = building go $gomode $out from $in
 
 rule gobuildlib
-    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="$picflag -I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=$gomode -pkgdir="$builddir" "$in" "$out" "$depfile"
+    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="$picflag -I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=$gomode -pkgdir="$builddir" $gonoinit "$in" "$out" "$depfile"
     depfile = $depfile
     description = building go library $out from $in
     pool = gobuilds_$gomode
@@ -150,7 +150,7 @@ rule gocover_html
     description = coverage to html of go package in $in
 
 rule goaddmain
-    command = install -m644 "$in" "$out"
+    command = seb -tool asset -out "$out" main.go
     description = setup go main package $out
 
 rule symlink

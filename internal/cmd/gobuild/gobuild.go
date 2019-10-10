@@ -29,15 +29,16 @@ import (
 )
 
 var (
-	flagset = flag.NewFlagSet("gobuild", flag.ExitOnError)
-	inpath  string
-	outpath string
-	depfile string
-	pkg     = flagset.String("pkg", "", "Explicit go package name. If unset the relative path is used.")
-	cflags  = flagset.String("cflags", "", "C flags to use with cgo.")
-	ldflags = flagset.String("ldflags", "", "Linker flags to use with cgo. Can contain objects or flags.")
-	mode    = flagset.String("mode", "prog", "Type of output. One of prog, prog-nocgo, module, test-prog, lib, piclib, test, bench, cover, cover_html")
-	pkgdir  = flagset.String("pkgdir", "", "Directory to store compiled standard packages. Only used when custom versions are needed.")
+	flagset   = flag.NewFlagSet("gobuild", flag.ExitOnError)
+	inpath    string
+	outpath   string
+	depfile   string
+	pkg       = flagset.String("pkg", "", "Explicit go package name. If unset the relative path is used.")
+	cflags    = flagset.String("cflags", "", "C flags to use with cgo.")
+	ldflags   = flagset.String("ldflags", "", "Linker flags to use with cgo. Can contain objects or flags.")
+	mode      = flagset.String("mode", "prog", "Type of output. One of prog, prog-nocgo, module, test-prog, lib, piclib, test, bench, cover, cover_html")
+	pkgdir    = flagset.String("pkgdir", "", "Directory to store compiled standard packages. Only used when custom versions are needed.")
+	libNoInit = flagset.Bool("lib-noinit", false, "Disable initializing the Go runtime automatically. Only applies to mode=lib and mode=piclib. Needed if your program forks, as the Go runtime can't survive that. See documentation for how to load the runtime manually.")
 
 	absin     string
 	absout    string

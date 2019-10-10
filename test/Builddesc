@@ -5,6 +5,7 @@ COMPONENT([
 	go/src/gopath
 	gomodules/loader
 	gomodules/module
+	gosrc
 	collect_special
 	srcdir
 	c
