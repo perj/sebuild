@@ -111,4 +111,5 @@ COMPONENT), that is noted specifically.
 
 ### Historical Notes
 
+* [2.0 Upgrade Notes](upgrade-notes/2.0.md)
 * [Tool Origins](origins.md)

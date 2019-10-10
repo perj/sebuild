@@ -5,13 +5,10 @@ package buildbuild
 import (
 	"errors"
 	"fmt"
-	gobuild "go/build"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
-	"strings"
 )
 
 type Plugin interface {
@@ -73,68 +70,6 @@ func (ops *GlobalOps) TempDirWithPlugins(plugs []string) string {
 	}
 	impfile.Close()
 	return tmpdir
-}
-
-func (ops *GlobalOps) RecompileWithPlugins() {
-	if !ops.Options.Quiet {
-		fmt.Fprintf(os.Stderr, "Recompiling seb with plugins (will fail if source is not available)\n")
-	}
-	var gofiles []string
-	if mypkg, err := gobuild.Import(modpath+"/cmd/seb", "", 0); err == nil {
-		for _, f := range mypkg.GoFiles {
-			gofiles = append(gofiles, filepath.Join(mypkg.Dir, f))
-		}
-	} else {
-		d := BuildtoolDir()
-		pattern := filepath.Join(d, "cmd", "seb", "*.go")
-		gofiles, err = filepath.Glob(pattern)
-		if err != nil {
-			panic(err)
-		}
-	}
-	tmpdir := ops.TempDirWithPlugins(ops.Config.Plugins)
-	defer os.RemoveAll(tmpdir)
-	for _, f := range gofiles {
-		abs, err := filepath.Abs(f)
-		if err != nil {
-			panic(err)
-		}
-		dst := filepath.Join(tmpdir, filepath.Base(f))
-		err = os.Symlink(abs, dst)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	binpath := path.Join(ops.Config.Buildpath, "obj/_build_build")
-	binabs, err := filepath.Abs(binpath)
-	if err != nil {
-		panic(err)
-	}
-
-	cmd := exec.Command("go", "build", "-o", binabs)
-	cmd.Dir = tmpdir
-	cmd.Stderr = os.Stderr
-	cmd.Env = os.Environ()
-	for idx, str := range cmd.Env {
-		// Workaround weird go invocation of CC, it just picks the first word, ignoring others.
-		// Assume the last word not starting with - is the one we want
-		if strings.HasPrefix(str, "CC=") {
-			args := strings.Split(str[3:], " ")
-			var i int
-			for i = len(args) - 1; i > 0; i-- {
-				if len(args[i]) > 0 && args[i][0] != '-' {
-					break
-				}
-			}
-			cmd.Env[idx] = "CC=" + strings.Join(args[i:], " ")
-			break
-		}
-	}
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (ops *GlobalOps) LoadPlugin(bd, ppath string) (Plugin, error) {

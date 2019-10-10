@@ -31,6 +31,8 @@ buildpath[buildpath]
 prefix:a[apref]
 extravars:a[avars.ninja]
 cflags:a[aflags]
+builtin_invars[bi_invars]
+invars[a b]
 `)
 	s := NewScanner(ioutil.NopCloser(r), "test")
 
@@ -45,6 +47,8 @@ buildversion_script[overridden.sh]
 buildpath[overridden]
 buildvars[foo2]
 compiler[cc2]
+builtin_invars[overridden]
+invars[c d]
 `)
 		s = NewScanner(ioutil.NopCloser(r), path)
 		return
@@ -84,6 +88,8 @@ compiler[cc2]
 		Buildpath:          "buildpath",
 		ConfigScript:       "./config_script.sh",
 		GodepsRule:         "godeps",
+		BuiltinInvars:      "bi_invars",
+		Invars:             []string{"c", "d", "a", "b"},
 	}
 
 	if !reflect.DeepEqual(c, e) {

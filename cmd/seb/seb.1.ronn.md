@@ -57,8 +57,10 @@ files refer to the documentation site, https://schibsted.github.io/sebuild
 
   Invoke an internal tool. These are usually invoked by ninja and are not
   considered stable.
-  The current available tools are `go-install`, `gobuild`, `header-install`,
-  `link`, `python-install` and `ronn`.
+  The current available tools are `copy-analyse`, `go-install`, `gperf-enum`,
+  `header-install`, `in`, `invars`, `link`, `python-install`, `ronn` and
+  `touch`.
+
   This flag can only be used as the first argument given to `seb`. The rest of
   the arguments are passed to the tool rather than parsed as seb or ninja
   flags.

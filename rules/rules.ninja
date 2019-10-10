@@ -194,5 +194,5 @@ rule in
     restat=1
 
 rule inconfig
-    command = echo '$out: $in '>$out.d; depfile=$out.d buildtooldir=$buildtooldir $inconfig $in > $out || ( rm $out ; exit 1 )
+    command = seb -tool invars -buildvars="$buildvars" -invars="$builtin_invars" -out "$out" $in
     depfile = $out.d

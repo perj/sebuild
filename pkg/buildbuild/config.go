@@ -76,6 +76,7 @@ type Config struct {
 	Configvars []string // Files with ninja variables, available to invars.
 	Rules      []string // Files with ninja rules.
 	Extravars  []string
+	Invars     []string
 
 	CompilerRuleDir       string
 	FlavorRuleDir         string
@@ -90,6 +91,8 @@ type Config struct {
 	BuildversionScript string
 	Buildpath          string
 	ConfigScript       string
+
+	BuiltinInvars string
 }
 
 type FlavorConfig struct {
@@ -213,6 +216,8 @@ func (ops *GlobalOps) ParseConfig(srcdir string, s *Scanner, flavors []string) P
 	delete(args.Unflavored, "buildvars")
 	ops.Config.Plugins = append(ops.Config.Plugins, args.Unflavored["extensions"]...)
 	delete(args.Unflavored, "extensions")
+	ops.Config.Invars = append(ops.Config.Invars, args.Unflavored["invars"]...)
+	delete(args.Unflavored, "invars")
 
 	// These overwrite the previous value.
 	for _, conf := range []struct {
@@ -226,6 +231,7 @@ func (ops *GlobalOps) ParseConfig(srcdir string, s *Scanner, flavors []string) P
 		{"flavor_rule_dir", &ops.Config.FlavorRuleDir},
 		{"compiler_flavor_rule_dir", &ops.Config.CompilerFlavorRuleDir},
 		{"godeps_rule", &ops.Config.GodepsRule},
+		{"builtin_invars", &ops.Config.BuiltinInvars},
 	} {
 		if args.Unflavored[conf.key] != nil {
 			*conf.conf = strings.Join(args.Unflavored[conf.key], " ")

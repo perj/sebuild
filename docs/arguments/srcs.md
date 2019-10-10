@@ -49,14 +49,9 @@ NOT further processed but can be used e.g. in a
 [conf](../descriptors/install.md#conf) or
 [scripts](../descriptors/install.md#scripts) argument.
 
-The script for generating the in.conf file is set using the `inconfig`
-ninja variable. It defaults to `$buildtooldir/scripts/invars.sh`. If you change
-it (e.g. via a [configvars file](../descriptors/config.md#configvars)), make
-sure to source the original to access its functions and the configvars values.
-Use a pair of lines like
-
-    source $buildtooldir/scripts/invars.sh "$@"
-    depend $buildtooldir/scripts/invars.sh
+The script for generating the in.conf file is set using the `invars`
+parameter in [CONFIG](../descriptors/config.md#invars) or via a
+configvars file as described there.
 
 ## Go Sources
 
