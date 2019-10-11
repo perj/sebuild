@@ -43,23 +43,13 @@ files refer to the documentation site, https://schibsted.github.io/sebuild
   Add an active build condition, which can be used to select what files
   or flags are active.
 
-`--install`
-
-  Install required ninja files into $HOME/.seb. Note that seb will first
-  look for the source directory for its package and use files from there
-  if available, then look at prefix/share/seb and only after that fall
-  back to $HOME/.seb.
-  If you need to use this flag make sure to re-run it after you upgrade
-  seb to install any new versions of the files. The files are included
-  as part of the binary, no download is required.
-
 `-tool` tool
 
   Invoke an internal tool. These are usually invoked by ninja and are not
   considered stable.
-  The current available tools are `copy-analyse`, `go-install`, `gperf-enum`,
-  `header-install`, `in`, `invars`, `link`, `python-install`, `ronn` and
-  `touch`.
+  The current available tools are `asset`, `copy-analyse`, `go-install`,
+  `gperf-enum`, `header-install`, `in`, `invars`, `link`, `python-install`,
+  `ronn` and `touch`.
 
   This flag can only be used as the first argument given to `seb`. The rest of
   the arguments are passed to the tool rather than parsed as seb or ninja
