@@ -193,19 +193,16 @@ Defaults to the bundled `rules/flavor` directory.
 A list of files that all Go target depends on. E.g. you can add go.mod
 here to rebuild all go targets when go.mod changes.
 
-By default this tries to execute a `godeps` rule, which you can define
-in a rules.ninja file. You can however also change the rule used with
-the `godeps_rule` argument. For simple cases the
-[touch](../arguments/specialsrcs.md#touch) rule should be suitable.
+By default this uses the `touch` rule to simply update a stamp file
+when the dependencies are modified. You can customize this with the
+`godeps_rule` argument. It will get all the godeps as input and the
+stamp file as output (all go packages then depend on the stampfile).
 
-For example
+Example:
 
 	godeps[go.mod]
-	godeps_rule[touch]
 
 is enough to rebuild all Go targets when go.mod changes.
-
-In 2.0 `touch` will be made the default value for `godeps_rule`
 
 Empty list by default.
 

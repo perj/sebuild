@@ -124,7 +124,7 @@ func (ops *GlobalOps) DefaultConfig() {
 	ops.Config.CompilerRuleDir = "$buildtooldir/rules/compiler"
 	ops.Config.FlavorRuleDir = "$buildtooldir/rules/flavor"
 	ops.Config.CompilerFlavorRuleDir = "$buildtooldir/rules/compiler-flavor"
-	ops.Config.GodepsRule = "godeps"
+	ops.Config.GodepsRule = "touch"
 
 	ops.Config.Conditions[runtime.GOOS] = true
 	if runtime.GOARCH == "amd64" {
