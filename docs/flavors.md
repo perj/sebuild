@@ -1,6 +1,6 @@
 # Flavors
 
-The build system supports building various flavors of the same code. The
+The build system supports building various flavors of the same code. A
 typical configuration will build 'dev' and 'release' versions of the code.
 
 There are three ways the flavors can be differentiated between each other.

@@ -26,7 +26,6 @@ A config directive with large contents will look something like this.
 		]
 		extravars[
 			scripts/build/toolrules.ninja
-			scripts/build/static.ninja
 		]
 		ruledeps[
 			in:$inconf,$configvars
@@ -235,3 +234,35 @@ A list of file names, relative paths.
 Global compilation rules. These ninja files gets included globally.
 Defaults to empty list. The rules.ninja bundled with sebuild is however always
 included as well, regardless of this value.
+
+## builtin_rules_ninja
+A file name, relative path.
+
+Can be used to override the builtin rules.ninja with a local version. If unset,
+the `SEBUILD_RULES_NINJA` environment variable is also checked before the
+builtin version is used. You can use `seb -tool asset rules.ninja` to show
+the current builtin one. Use this sparingly since the builtin version
+changes almost every version, even minor ones.
+
+## builtin_defaults_ninja
+A file name, relative path.
+
+Overrides the builtin defaults.ninja, similar to
+[builtin_rules_ninja](#builtin_rules_ninja). If unset, the
+`SEBUILD_DEFAULTS_NINJA` environment variable is also checked before the
+builtin version is used.
+
+This file is used to set the default values mentioned on the
+[Compiler Flags](../compiler-flags.md) page.
+
+## builtin_static_ninja
+A file name, relative path.
+
+Overrides the builtin static.ninja, similar to
+[builtin_rules_ninja](#builtin_rules_ninja). If unset, the
+`SEBUILD_STATIC_NINJA` environment variable is also checked before the
+builtin version is used.
+
+This file is used in the flavors top level build.ninja and can thus refer to
+flavor specific values set in buildvars.ninja and [extravars](#extravars)
+files.

@@ -13,8 +13,6 @@ the generated ninja file.
 * `$destroot` - the root installation directory. (`build/dev` or such).
 * `$buildtools` - directory where the tools are if you need an explicit
   dependency or refer to a tool in a extravars file.
-* `$buildtooldir` - Bundled sebuild directory containing the rules/rules.ninja
-  file and others.
 * `$objdir` - Set for each descriptor. The directory where intermediate
   files are placed.
 * `$buildflavor` - The flavor name.

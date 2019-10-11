@@ -20,19 +20,19 @@ it from both Makefiles and ninja files.
 For more information about infiles see the
 [CONFIG parameter](descriptors/config.md#invars).
 
-## static.ninja
+## Asset static.ninja
 
-The file `rules/static.ninja` contains certain static targets we need to build
-and don't really have other ways to express them. Currently it contains the
-rules for `build_version.h` and `in.conf`.
+The `static.ninja` asset is included in the main flavor ninja files. It
+contains certain static targets we need to build and don't really have other
+ways to express them.
 
-## rules.ninja
+## Asset rules.ninja
 
-`rules/rules.ninja` contain the main rules for compilation (like how to invoke
-compilers, how to link, etc.). Read the ninja documentation before changing
-anything in `rules.ninja`. Be careful about failing rules which just simply
-redirect some script output into the $out file. Make sure to remove the $out
-file if the script fails. If you don't, the next build can get confused and not
-rebuild the file even though it failed the previous time. Make removes the file
-for you, ninja doesn't. There are some examples in there how to do this, but
-the safest is probably to wrap everything in a script.
+The `rules.ninja` asset contain the main rules for compilation (like how to
+invoke compilers, how to link, etc.). Read the ninja documentation before
+changing anything in `rules.ninja`. Be careful about failing rules which just
+simply redirect some script output into the $out file.  Make sure to remove the
+$out file if the script fails. If you don't, the next build can get confused
+and not rebuild the file even though it failed the previous time. Make removes
+the file for you, ninja doesn't. There are some examples in there how to do
+this, but the safest is probably to wrap everything in a script.
