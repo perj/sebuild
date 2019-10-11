@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
@@ -56,5 +57,12 @@ func BuildPlugin(ops *buildbuild.GlobalOps, ppath string) error {
 		return err
 	}
 	_, err = plugin.Open(binpath)
+	if err != nil && strings.Contains(err.Error(), "previous failure") {
+		if !ops.Options.Quiet {
+			fmt.Fprintln(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, `Trying again due to "previous failure".`)
+		}
+		err = buildbuild.ErrNeedReExec
+	}
 	return err
 }
