@@ -92,7 +92,10 @@ type Config struct {
 	Buildpath          string
 	ConfigScript       string
 
-	BuiltinInvars string
+	BuiltinInvars        string
+	BuiltinDefaultsNinja string
+	BuiltinRulesNinja    string
+	BuiltinStaticNinja   string
 }
 
 type FlavorConfig struct {
@@ -121,9 +124,6 @@ func (ops *GlobalOps) DefaultConfig() {
 		ops.Config.Buildpath = "build"
 	}
 	ops.Config.BuildversionScript = "git rev-list HEAD 2>/dev/null|wc -l|xargs"
-	ops.Config.CompilerRuleDir = "$buildtooldir/rules/compiler"
-	ops.Config.FlavorRuleDir = "$buildtooldir/rules/flavor"
-	ops.Config.CompilerFlavorRuleDir = "$buildtooldir/rules/compiler-flavor"
 	ops.Config.GodepsRule = "godeps"
 
 	ops.Config.Conditions[runtime.GOOS] = true
@@ -232,6 +232,9 @@ func (ops *GlobalOps) ParseConfig(srcdir string, s *Scanner, flavors []string) P
 		{"compiler_flavor_rule_dir", &ops.Config.CompilerFlavorRuleDir},
 		{"godeps_rule", &ops.Config.GodepsRule},
 		{"builtin_invars", &ops.Config.BuiltinInvars},
+		{"builtin_defaults_ninja", &ops.Config.BuiltinDefaultsNinja},
+		{"builtin_rules_ninja", &ops.Config.BuiltinRulesNinja},
+		{"builtin_static_ninja", &ops.Config.BuiltinStaticNinja},
 	} {
 		if args.Unflavored[conf.key] != nil {
 			*conf.conf = strings.Join(args.Unflavored[conf.key], " ")

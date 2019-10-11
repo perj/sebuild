@@ -34,8 +34,16 @@ func Main(args ...string) {
 	}
 	wb := bufio.NewWriter(w)
 	var assets = map[string]string{
-		"invars.sh": assets.InvarsSh,
-		"main.go":   assets.MainGo,
+		"invars.sh":            assets.InvarsSh,
+		"main.go":              assets.MainGo,
+		"compiler/clang.ninja": assets.CompilerClangNinja,
+		"compiler/gcc.ninja":   assets.CompilerGccNinja,
+		"defaults.ninja":       assets.DefaultsNinja,
+		"flavor/dev.ninja":     assets.FlavorDevNinja,
+		"flavor/gcov.ninja":    assets.FlavorGcovNinja,
+		"flavor/release.ninja": assets.FlavorReleaseNinja,
+		"rules.ninja":          assets.RulesNinja,
+		"static.ninja":         assets.StaticNinja,
 	}
 	ecode := 0
 	var err error

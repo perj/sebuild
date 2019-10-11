@@ -131,7 +131,6 @@ func main() {
 			defer f.Close()
 			var ourb bytes.Buffer
 			fmt.Fprintf(&ourb, "# %s\n", buildbuild.BuildBuildArgs(os.Args))
-			fmt.Fprintf(&ourb, "# %s\n", buildbuild.BuildtoolDir())
 			ours := ourb.Bytes()
 			theirs := make([]byte, len(ours))
 			if _, err := io.ReadFull(f, theirs); err != nil {

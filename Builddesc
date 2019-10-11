@@ -3,5 +3,4 @@
 COMPONENT([
 	cmd/seb
 	pkg/buildbuild
-	rules
 ])
