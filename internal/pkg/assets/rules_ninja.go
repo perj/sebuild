@@ -31,13 +31,13 @@ rule final_analyse
 
 link_wrapper = seb -tool link
 rule linkxx
-    command = $link_wrapper $cxx $ldflags $ldopts $gcov_ldopts -L $libdir -L $scmcoord_contrib/lib -o $out @$out.rsp $ldlibs
+    command = $link_wrapper $cxx $ldflags $ldopts $gcov_ldopts -L $libdir -o $out @$out.rsp $ldlibs
     description = link $out
     rspfile = $out.rsp
     rspfile_content = $in
 
 rule link
-    command = $link_wrapper $cc $ldflags $ldopts $gcov_ldopts -L $libdir -L $scmcoord_contrib/lib -o $out @$out.rsp $ldlibs
+    command = $link_wrapper $cc $ldflags $ldopts $gcov_ldopts -L $libdir -o $out @$out.rsp $ldlibs
     description = link $out
     rspfile = $out.rsp
     rspfile_content = $in
@@ -125,31 +125,31 @@ pool gobuilds_piclib
 gobuild_tool=GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$gobuild_test_flags CGO_ENABLED=$cgo_enabled seb -tool gobuild
 
 rule gobuild
-    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=$gomode -pkgdir="$builddir" "$in" "$out" "$objdir/depfile-$gomode"
+    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir $ldlibs" -mode=$gomode -pkgdir="$builddir" "$in" "$out" "$objdir/depfile-$gomode"
     depfile = $objdir/depfile-$gomode
     description = building go $gomode $out from $in
 
 rule gobuildlib
-    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="$picflag -I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=$gomode -pkgdir="$builddir" $gonoinit "$in" "$out" "$depfile"
+    command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="$picflag -I $incdir $includes $platform_includes" -ldflags="-L $libdir $ldlibs" -mode=$gomode -pkgdir="$builddir" $gonoinit "$in" "$out" "$depfile"
     depfile = $depfile
     description = building go library $out from $in
     pool = gobuilds_$gomode
 
 rule gotest
-    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=test -pkgdir="$builddir" "$in"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir $ldlibs" -mode=test -pkgdir="$builddir" "$in"
     description = testing go package in $in
 
 rule gobench
-    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=bench -pkgdir="$builddir" "$in" "$benchflags"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $platform_includes" -ldflags="-L $libdir $ldlibs" -mode=bench -pkgdir="$builddir" "$in" "$benchflags"
     description = benching go package in $in
 
 rule gocover
-    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=cover -pkgdir="$builddir" "$in" "$out" "$objdir/depfile-cover"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir $ldlibs" -mode=cover -pkgdir="$builddir" "$in" "$out" "$objdir/depfile-cover"
     depfile = $objdir/depfile-cover
     description = testing coverage of go package in $in
 
 rule gocover_html
-    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=cover_html -pkgdir="$builddir" "$in" "$out"
+    command = $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir $ldlibs" -mode=cover_html -pkgdir="$builddir" "$in" "$out"
     description = coverage to html of go package in $in
 
 rule goaddmain
