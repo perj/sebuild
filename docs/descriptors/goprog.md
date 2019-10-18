@@ -49,20 +49,6 @@ The gopkg path used must name a `main` package.
 
 ## Ninja Variables
 
-### gopath
-Only needed for older Go versions, when not using Go modules.
-This will be used to set the GOPATH environment variable while building,
-and will override any such set by the environment.
-
-Unlike the normal GOPATH, the gopath config variable can use paths relative to
-the project root, they'll be changed into full paths by gobuild.sh and
-invars.sh.
-
-It's recommended to use Go modules instead. Defaults to the `GOPATH`
-environment variable. Note that Go 1.11 has an issue where parallell module
-downloads might stomp on eachother. Please either use Go 1.12 or manually
-download modules via `go mod download`.
-
 ### gobuild_flags
 Flags added when executing `go build`. This can be used to for example add
 build tags or other build options.

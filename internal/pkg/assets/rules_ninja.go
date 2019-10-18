@@ -122,7 +122,7 @@ pool gobuilds_piclib
 # variables if not set there however.  This is for dependencies to work more
 # properly as configvars script changes retrigger builds but environment
 # variables do not.
-gobuild_tool=GOPATH="$gopath" GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$gobuild_test_flags CGO_ENABLED=$cgo_enabled seb -tool gobuild
+gobuild_tool=GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$gobuild_test_flags CGO_ENABLED=$cgo_enabled seb -tool gobuild
 
 rule gobuild
     command = GOOS="$goos" GOARCH="$goarch" $gobuild_tool -pkg="$gopkg" -cflags="-I $incdir $includes $platform_includes" -ldflags="-L $libdir -L $scmcoord_contrib/lib $ldlibs" -mode=$gomode -pkgdir="$builddir" "$in" "$out" "$objdir/depfile-$gomode"

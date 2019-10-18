@@ -11,8 +11,8 @@ ninja -f $BUILDPATH/build.ninja
 grep '# Flavors: regress, prod' $BUILDPATH/build.ninja
 grep '# Conditions:.*cbar, .*cbaz, .*cfoo' $BUILDPATH/build.ninja
 
-grep -q gopath $BUILDPATH/regress/collect_test/hejsan.txt
-grep -q gopath $BUILDPATH/regress/collect_test/other.txt
+grep -q goarch $BUILDPATH/regress/collect_test/hejsan.txt
+grep -q goarch $BUILDPATH/regress/collect_test/other.txt
 grep -q bar $BUILDPATH/obj/regress/lib/test
 grep -q fooval $BUILDPATH/regress/regress/infile/infile
 
@@ -28,20 +28,19 @@ $BUILDPATH/regress/bin/gosrc_test_noinit
 # Load the built go module.
 $BUILDPATH/regress/bin/loader $BUILDPATH/regress/modules/gomod.so
 
-ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gotest/gopath
-ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html
-env GOPATH=$PWD/go $BUILDPATH/regress/gotest/gopath.test
+ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gotest/goarch
+ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/goarch-coverage.html
 
 # This sleep is unfortunately necessary because ninja doesn't
 # recognize timestamp differences smaller than one second.
 sleep 1
 
 # Test that we don't rebuild anything if nothing has changed
-if (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html | grep -q 'coverage to') ; then echo "gopath-coverage.html rebuilt without changes" ; exit 1 ; fi
+if (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/goarch-coverage.html | grep -q 'coverage to') ; then echo "goarch-coverage.html rebuilt without changes" ; exit 1 ; fi
 
 # Then test that we do rebuild if something has changed
-touch go/src/gopath/main_test.go
-if ! (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/gopath-coverage.html | grep -q 'coverage to') ; then echo "gopath-coverage.html not rebuilt with changes" ; exit 1 ; fi
+touch goarch/main_test.go
+if ! (ninja -f $BUILDPATH/build.ninja $BUILDPATH/regress/gocover/goarch-coverage.html | grep -q 'coverage to') ; then echo "goarch-coverage.html not rebuilt with changes" ; exit 1 ; fi
 
 # Test of enabled argument
 test -f $BUILDPATH/obj/regress/lib/enabled
