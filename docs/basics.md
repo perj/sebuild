@@ -43,3 +43,6 @@ The finished product files that seb produce are by default located in the
 `build/dev/` folder. This can however be customized by both environment
 variables and `Builddesc` config settings. But without those the command
 `find build/dev/` should give you a nice output of what's been created.
+
+The `BUILDPATH` environment variable is used to change `build` into something
+else. A personal favorite is to use `export BUILDPATH=.build`.

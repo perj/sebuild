@@ -15,7 +15,7 @@ linked into modules.
 `LINKERSET_LIB` is similar to lib. Instead of creating a normal library
 however, it creates a partial linked object file.  This has the effect of
 including all the symbols in the final binary, instead of only the referenced
-ones, which is required to access otherwise unreferences linkerset entries.
+ones, which is required to access otherwise unreferenced linkerset entries.
 
 ## Arguments
 

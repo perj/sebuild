@@ -5,9 +5,8 @@ package buildbuild
 import (
 	"bufio"
 	"bytes"
-	"errors"
 	"fmt"
-	gobuild "go/build"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -15,10 +14,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-)
 
-var (
-	CantFindBuildtools = errors.New("Can't find directory containing buildtools. Use seb -install to install them manually.")
+	"github.com/schibsted/sebuild/internal/pkg/assets"
 )
 
 const modpath = "github.com/schibsted/sebuild"
@@ -37,86 +34,8 @@ func mkpath(p ...string) {
 	}
 }
 
-// Buildtooldir calls the package level BuildtoolDir. Kept for v1
-// compatibility only.
-func (ops *GlobalOps) BuildtoolDir() string {
-	return BuildtoolDir()
-}
-
-// Buildtooldir figures out what directory contains the sebuild ninja runtime.
-// First it tries to import the go package and check for sources, if that
-// fails it looks for a directory based on the binary path. If that also fails
-// it checks $HOME/.seb/
-func BuildtoolDir() string {
-	if p := os.Getenv("BUILDTOOLDIR"); p != "" {
-		return p
-	}
-
-	// First check GOPATH.
-	pkg, err := gobuild.Import(modpath+"/cmd/seb", "", gobuild.FindOnly)
-	if err == nil {
-		return filepath.Dir(filepath.Dir(pkg.Dir))
-	}
-
-	// Else derive from binary
-	binp, err := exec.LookPath(os.Args[0])
-	if err != nil {
-		panic(err)
-	}
-
-	basep := filepath.Dir(binp)
-	cands := []string{basep}
-	realp, err := filepath.EvalSymlinks(basep)
-	if err == nil {
-		cands = append(cands, realp)
-	}
-	for _, p := range cands {
-		if filepath.Base(p) == "bin" {
-			// If directory containing binary is called "bin" we might have src there as well.
-			srcp := filepath.Join(p, "../src/"+modpath)
-			_, err := os.Stat(srcp)
-			if err == nil {
-				return srcp
-			}
-			// Also check for share/seb
-			srcp = filepath.Join(p, "../share/seb")
-			_, err = os.Stat(srcp)
-			if err == nil {
-				return srcp
-			}
-		}
-		// If directory is called "sebuild" we're probably running from a source directory.
-		if filepath.Base(p) == "sebuild" {
-			// Check for rules.ninja just in case.
-			_, err := os.Stat(filepath.Join(p, "rules/rules.ninja"))
-			if err == nil {
-				return filepath.Dir(p)
-			}
-		}
-	}
-	// Finally fallback to $HOME/.seb
-	// XXX should probably check the version there somehow.
-	if d := os.Getenv("HOME"); d != "" {
-		_, err := os.Stat(filepath.Join(d, ".seb/rules/rules.ninja"))
-		if err == nil {
-			return filepath.Join(d, ".seb")
-		}
-	}
-	panic(CantFindBuildtools)
-}
-
 func (ops *GlobalOps) GodepsStamp() string {
 	return path.Join(ops.Config.Buildpath, "obj/_go/.stamp")
-}
-
-func (ops *GlobalOps) StatRulePath(pth string) bool {
-	// Special handle $buildtooldir. Not super happy about it
-	// but it's the only solution I can think of.
-	if strings.HasPrefix(pth, "$buildtooldir") {
-		pth = BuildtoolDir() + pth[len("$buildtooldir"):]
-	}
-	_, err := os.Stat(pth)
-	return err == nil
 }
 
 // Strips args of anything after -- and returns it joined.
@@ -153,7 +72,6 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	w := bufio.NewWriter(topfile)
 
 	fmt.Fprintf(w, "# %s\n", BuildBuildArgs(os.Args))
-	fmt.Fprintf(w, "# %s\n", BuildtoolDir())
 	fmt.Fprintf(w, "# Flavors: %s\n", strings.Join(ops.Config.ActiveFlavors, ", "))
 	conds := make([]string, 0, len(ops.Config.Conditions))
 	for c := range ops.Config.Conditions {
@@ -179,7 +97,6 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	fmt.Fprintf(w, "cgo_enabled=$$CGO_ENABLED\n")
 
 	fmt.Fprintf(w, "build_build = %s\n", BuildBuildArgs(os.Args))
-	fmt.Fprintf(w, "buildtooldir=%s\n", BuildtoolDir())
 	fmt.Fprintf(w, "builtin_invars = %s\n", ops.Config.BuiltinInvars)
 	iv := strings.TrimSpace(strings.Join(ops.Config.Invars, " "))
 	if iv == "" {
@@ -191,23 +108,18 @@ func (ops *GlobalOps) OutputTop() (err error) {
 		cv = "/dev/null"
 	}
 	fmt.Fprintf(w, "configvars = %s\n", cv)
-	fmt.Fprintf(w, "include $buildtooldir/rules/defaults.ninja\n")
+	ops.outputDefaultsNinja(w)
 	for _, bp := range ops.Config.Buildparams {
 		fmt.Fprintln(w, bp)
 	}
-	if ops.Config.CompilerRuleDir != "" {
-		pth := ops.Config.CompilerRuleDir + "/" + ops.CompilerFlavor + ".ninja"
-		if ops.StatRulePath(pth) {
-			fmt.Fprintf(w, "include %s\n", pth)
-		}
-	}
+	ops.outputCompilerNinja(w)
 	for _, cv := range ops.Config.Configvars {
 		fmt.Fprintf(w, "include %s\n", cv)
 	}
 	for _, r := range ops.Config.Rules {
 		fmt.Fprintf(w, "include %s\n", r)
 	}
-	fmt.Fprintf(w, "include $buildtooldir/rules/rules.ninja\n")
+	ops.outputRulesNinja(w)
 	if len(ops.Config.Godeps) > 0 {
 		fmt.Fprintf(w, "build %s: %s %s\n", ops.GodepsStamp(), ops.Config.GodepsRule,
 			strings.Join(ops.Config.Godeps, " "))
@@ -293,18 +205,7 @@ func (ops *GlobalOps) OutputFlavor(topdir, flavor string) {
 	fmt.Fprintf(w, "buildvars=%s\n", buildvars)
 	fmt.Fprintf(w, "include $buildvars\n")
 
-	if ops.Config.FlavorRuleDir != "" {
-		pth := ops.Config.FlavorRuleDir + "/" + flavor + ".ninja"
-		if ops.StatRulePath(pth) {
-			fmt.Fprintf(w, "include %s\n", pth)
-		}
-	}
-	if ops.Config.CompilerFlavorRuleDir != "" {
-		pth := ops.Config.CompilerFlavorRuleDir + "/" + ops.CompilerFlavor + "-" + flavor + ".ninja"
-		if ops.StatRulePath(pth) {
-			fmt.Fprintf(w, "include %s\n", pth)
-		}
-	}
+	ops.outputFlavorNinja(w, flavor)
 	var evs []string
 	if flavorConf != nil {
 		evs = append(evs, flavorConf.Extravars...)
@@ -313,7 +214,7 @@ func (ops *GlobalOps) OutputFlavor(topdir, flavor string) {
 	for _, ev := range evs {
 		fmt.Fprintf(w, "include %s\n", ev)
 	}
-	fmt.Fprintf(w, "include $buildtooldir/rules/static.ninja\n")
+	ops.outputStaticNinja(w)
 	for sn := range subninjas {
 		fmt.Fprintf(w, "subninja %s/%s.ninja\n", builddir, sn)
 	}
@@ -453,4 +354,80 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 	}
 	descfile.Close()
 	return defaults
+}
+
+func (ops *GlobalOps) outputDefaultsNinja(w io.Writer) {
+	if ops.Config.BuiltinDefaultsNinja != "" {
+		fmt.Fprintf(w, "include %s\n", ops.Config.BuiltinDefaultsNinja)
+	} else if ninja := os.Getenv("SEBUILD_DEFAULTS_NINJA"); ninja != "" {
+		fmt.Fprintf(w, "include %s\n", ninja)
+	} else {
+		fmt.Fprint(w, assets.DefaultsNinja)
+	}
+}
+
+func (ops *GlobalOps) outputCompilerNinja(w io.Writer) {
+	if ops.Config.CompilerRuleDir != "" {
+		pth := ops.Config.CompilerRuleDir + "/" + ops.CompilerFlavor + ".ninja"
+		if _, err := os.Stat(pth); err == nil {
+			fmt.Fprintf(w, "include %s\n", pth)
+		}
+	} else if ninja := os.Getenv("SEBUILD_COMPILER_NINJA"); ninja != "" {
+		fmt.Fprintf(w, "include %s\n", ninja)
+	} else {
+		switch ops.CompilerFlavor {
+		case "gcc":
+			fmt.Fprint(w, assets.CompilerGccNinja)
+		case "clang":
+			fmt.Fprint(w, assets.CompilerClangNinja)
+		}
+	}
+}
+
+func (ops *GlobalOps) outputRulesNinja(w io.Writer) {
+	if ops.Config.BuiltinRulesNinja != "" {
+		fmt.Fprintf(w, "include %s\n", ops.Config.BuiltinRulesNinja)
+	} else if ninja := os.Getenv("SEBUILD_RULES_NINJA"); ninja != "" {
+		fmt.Fprintf(w, "include %s\n", ninja)
+	} else {
+		fmt.Fprint(w, assets.RulesNinja)
+	}
+}
+
+func (ops *GlobalOps) outputFlavorNinja(w io.Writer, flavor string) {
+	if ops.Config.FlavorRuleDir != "" {
+		pth := ops.Config.FlavorRuleDir + "/" + flavor + ".ninja"
+		if _, err := os.Stat(pth); err == nil {
+			fmt.Fprintf(w, "include %s\n", pth)
+		}
+	} else if ninja := os.Getenv("SEBUILD_FLAVOR_NINJA_" + flavor); ninja != "" {
+		fmt.Fprintf(w, "include %s\n", ninja)
+	} else if ninja := os.Getenv("SEBUILD_FLAVOR_NINJA"); ninja != "" {
+		fmt.Fprintf(w, "include %s\n", ninja)
+	} else {
+		switch flavor {
+		case "dev":
+			fmt.Fprint(w, assets.FlavorDevNinja)
+		case "gcov":
+			fmt.Fprint(w, assets.FlavorGcovNinja)
+		case "release":
+			fmt.Fprint(w, assets.FlavorReleaseNinja)
+		}
+	}
+	if ops.Config.CompilerFlavorRuleDir != "" {
+		pth := ops.Config.CompilerFlavorRuleDir + "/" + ops.CompilerFlavor + "-" + flavor + ".ninja"
+		if _, err := os.Stat(pth); err == nil {
+			fmt.Fprintf(w, "include %s\n", pth)
+		}
+	}
+}
+
+func (ops *GlobalOps) outputStaticNinja(w io.Writer) {
+	if ops.Config.BuiltinStaticNinja != "" {
+		fmt.Fprintf(w, "include %s\n", ops.Config.BuiltinStaticNinja)
+	} else if ninja := os.Getenv("SEBUILD_STATIC_NINJA"); ninja != "" {
+		fmt.Fprintf(w, "include %s\n", ninja)
+	} else {
+		fmt.Fprint(w, assets.StaticNinja)
+	}
 }

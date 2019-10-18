@@ -6,8 +6,6 @@
 // information about this tool.
 package main
 
-//go:generate go-bindata -nomemcopy -ignore Builddesc -ignore cmd.*\.go$ -prefix ../../ ../../internal/... ../../rules/...
-
 import (
 	"bytes"
 	"flag"
@@ -60,9 +58,8 @@ func (a *ArrayFlag) String() string {
 }
 
 var (
-	noexec  bool
-	install bool
-	topdir  string
+	noexec bool
+	topdir string
 )
 
 func main() {
@@ -81,15 +78,9 @@ func main() {
 	flag.Var(SetFlag(ops.Options.WithoutFlavors), "without-flavor", "Don't generate this flavor. Can be used multiple times.")
 	flag.Var(SetFlag(ops.Config.Conditions), "condition", "Add build condition. Can be used multiple times.")
 	flag.BoolVar(&noexec, "noexec", false, "Don't execute ninja")
-	flag.BoolVar(&install, "install", false, "Install ninja runtime into $HOME/.seb/")
 	flag.StringVar(&topdir, "topdir", "", "Set top directory manually instead of scanning for Builddesc.top")
 	flag.Var((*ArrayFlag)(&ops.Config.Configvars), "configvars", "Add a configvars file. These are read before configvars files in CONFIG. Can be used multiple times.")
 	flag.Parse()
-
-	if install {
-		installTools(ops.Options.Quiet)
-		return
-	}
 
 	if topdir == "" {
 		var err error
@@ -131,7 +122,6 @@ func main() {
 			defer f.Close()
 			var ourb bytes.Buffer
 			fmt.Fprintf(&ourb, "# %s\n", buildbuild.BuildBuildArgs(os.Args))
-			fmt.Fprintf(&ourb, "# %s\n", buildbuild.BuildtoolDir())
 			ours := ourb.Bytes()
 			theirs := make([]byte, len(ours))
 			if _, err := io.ReadFull(f, theirs); err != nil {
@@ -182,23 +172,6 @@ func main() {
 	}
 
 	log.Fatal(RunNinja("", ops.Config.Buildpath))
-}
-
-func installTools(quiet bool) {
-	dir := os.Getenv("HOME")
-	if dir == "" {
-		fmt.Fprintln(os.Stderr, "$HOME is unset, can't install.")
-		os.Exit(1)
-	}
-	dir = filepath.Join(dir, ".seb")
-	err := RestoreAssets(dir, "")
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
-	}
-	if !quiet {
-		fmt.Printf("Seb tools installed to %s\n", dir)
-	}
 }
 
 func mainTool() {

@@ -13,3 +13,6 @@ to find these. Another option is to set cflags in an
 
 For more information about how the compiler and linker are invoked, see
 [Compiler and Linker Flags](compiler-flags.md).
+
+Dynamic values can be set via the
+[config_script](descriptors/config.md#config_script).

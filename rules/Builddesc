@@ -1,6 +1,0 @@
-INSTALL(share/seb/rules
-	conf[
-		*.ninja
-		*/*.ninja
-	]
-)
