@@ -5,10 +5,10 @@ package buildbuild
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
-	"path/filepath"
+	"syscall"
 )
 
 type Plugin interface {
@@ -32,6 +32,8 @@ var (
 
 var (
 	NoSuchPlugin = errors.New("Plugin doesn't exist in binary")
+
+	ErrNeedReExec = errors.New("need to re-execute binary")
 )
 
 func InitPlugin(pkg string, plug Plugin) {
@@ -39,37 +41,6 @@ func InitPlugin(pkg string, plug Plugin) {
 		panic(`Duplicate plugin "` + pkg + `"`)
 	}
 	LoadedPlugins[pkg] = plug
-}
-
-func (ops *GlobalOps) TempDirWithPlugins(plugs []string) string {
-	tmpdir, err := ioutil.TempDir("", "build-build")
-	if err != nil {
-		panic(err)
-	}
-	abs, err := filepath.Abs(".")
-	if err != nil {
-		panic(err)
-	}
-	os.Symlink(abs, filepath.Join(tmpdir, "cwd"))
-	impname := filepath.Join(tmpdir, "imports.go")
-	impfile, err := os.OpenFile(impname, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
-	if err != nil {
-		panic(err)
-	}
-	_, err = fmt.Fprintf(impfile, "package main\n\n")
-	if err != nil {
-		panic(err)
-	}
-	for _, p := range plugs {
-		// Could use vendor here, but feels like abusing it.
-		p = filepath.Join("cwd", p)
-		_, err := fmt.Fprintf(impfile, "import _ \"./%s\"\n", p)
-		if err != nil {
-			panic(err)
-		}
-	}
-	impfile.Close()
-	return tmpdir
 }
 
 func (ops *GlobalOps) LoadPlugin(bd, ppath string) (Plugin, error) {
@@ -80,6 +51,9 @@ func (ops *GlobalOps) LoadPlugin(bd, ppath string) (Plugin, error) {
 	if ops.BuildPlugin != nil {
 		err := ops.BuildPlugin(ops, ppath)
 		if err != nil {
+			if err == ErrNeedReExec {
+				ops.ReExec()
+			}
 			return nil, &ParseError{err, bd, ppath}
 		}
 		if plug := LoadedPlugins[pkg]; plug != nil {
@@ -87,6 +61,17 @@ func (ops *GlobalOps) LoadPlugin(bd, ppath string) (Plugin, error) {
 		}
 	}
 	return nil, &ParseError{NoSuchPlugin, ppath, bd}
+}
+
+func (ops *GlobalOps) ReExec() {
+	bin, err := exec.LookPath(os.Args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to re-exec %q", os.Args[0])
+		return
+	}
+	if err := syscall.Exec(bin, os.Args, syscall.Environ()); err != nil {
+		panic(err)
+	}
 }
 
 func (ops *GlobalOps) StartPlugin(bd, ppath string) error {
