@@ -2,7 +2,6 @@
 
 COMPONENT([
 	goarch
-	go/src/gopath
 	gomodules/loader
 	gomodules/module
 	gosrc

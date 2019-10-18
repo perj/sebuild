@@ -7,11 +7,10 @@
 // dependencies such that ninja can determine if it has to re-compile Go
 // binaries or not.
 //
-// Normally, with go modules, relative paths are used to build, this fits well
-// into using the top level directory for all things. Across modules and when
-// using GOPATH we however cd into the source directory. A make-compatible
-// diagnostic is in that case print to help editors such as vim to detect what
-// directory error messages point to.
+// Normally relative paths are used to build, this fits well into using the top
+// level directory for all things. Across modules we however cd into the source
+// directory. A make-compatible diagnostic is in that case print to help
+// editors such as vim to detect what directory error messages point to.
 //
 // The go tool will itself change the current directory. This means that many
 // of the paths we give it have to be absolute paths. Effort is thus spent
@@ -133,7 +132,6 @@ func Main(args ...string) {
 	case "cover":
 		executeWithTestFlagsAndPkg("go", "test", "-coverprofile="+absout)
 	case "cover_html":
-		checkGomodGopath()
 		execute("go", "tool", "cover", "-html="+inpath, "-o", outpath)
 	case "lib", "piclib":
 		buildCArchive(*mode, ldflags)
@@ -160,8 +158,8 @@ func needDepfile(mode string) bool {
 }
 
 // setAbsPath sets absin, absout, absdep, abspkgdir, objs, CGO_CFLAGS,
-// CGO_LDFLAGS, GOPATH to absolute paths.  It uses the globals inpath, output,
-// cflags, ldflags, pkgdir and the GOPATH environment variable.
+// CGO_LDFLAGS to absolute paths.  It uses the globals inpath, output,
+// cflags, ldflags, pkgdir.
 func setAbsPaths() (err error) {
 	absin, err = filepath.Abs(inpath)
 	if err != nil {
@@ -184,7 +182,6 @@ func setAbsPaths() (err error) {
 
 	setAbsList("CGO_CFLAGS", " ", *cflags, false)
 	setAbsList("CGO_LDFLAGS", " ", *ldflags, true)
-	setAbsPathList("GOPATH", ":", os.Getenv("GOPATH"))
 	return nil
 }
 
@@ -213,27 +210,6 @@ func setAbsList(env, sep, list string, setobjs bool) {
 	os.Setenv(env, liststr.String())
 }
 
-func setAbsPathList(env, sep, list string) {
-	var liststr strings.Builder
-	for _, elem := range filepath.SplitList(list) {
-		if elem == "" {
-			continue
-		}
-		if !strings.HasPrefix(elem, "-") {
-			newelem, err := filepath.Abs(elem)
-			// Errors are not fatal, just don't update.
-			if err == nil {
-				elem = newelem
-			}
-		}
-		if liststr.Len() > 0 {
-			liststr.WriteString(sep)
-		}
-		liststr.WriteString(elem)
-	}
-	os.Setenv(env, liststr.String())
-}
-
 // setRelPkg might set *pkg to a relative if it's currently empty.
 // In some cases this can't be done, and *pkg is unchanged empty string.
 func setRelPkg() {
@@ -252,6 +228,7 @@ func setRelPkg() {
 	if len(gomod) == 0 {
 		return
 	}
+
 	// Check for cross module source directory. We can't use relative path with that.
 	srcmodcmd := exec.Command("go", "env", "GOMOD")
 	srcmodcmd.Dir = absin
@@ -263,25 +240,4 @@ func setRelPkg() {
 	if bytes.Equal(gomod, srcmod) {
 		*pkg = "./" + inpath
 	}
-}
-
-func checkGomodGopath() {
-	// On Go 1.11 and 1.12 only, auto modules might fail here due to being
-	// run from outside gopath but working on files inside. Go 1.11 is not
-	// supported.
-	if os.Getenv("GOPATH") == "" {
-		return
-	}
-	modmode := os.Getenv("GO111MODULE")
-	if modmode != "" && modmode != "auto" {
-		return
-	}
-	gover, err := exec.Command("go", "version").Output()
-	if err != nil {
-		return
-	}
-	if !bytes.Contains(gover, []byte("go1.12")) {
-		return
-	}
-	os.Setenv("GO111MODULE", "off")
 }
