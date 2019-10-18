@@ -91,7 +91,6 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	// to override them. The reason to do it this way is that dependencies
 	// don't work with environment variables. Changing a configvars file
 	// does trigger rebuilds properly.
-	fmt.Fprintf(w, "gopath=$$GOPATH\n")
 	fmt.Fprintf(w, "gobuild_flags=$$GOBUILD_FLAGS\n")
 	fmt.Fprintf(w, "gobuild_test_flags=$$GOBUILD_TEST_FLAGS\n")
 	fmt.Fprintf(w, "cgo_enabled=$$CGO_ENABLED\n")

@@ -2,3 +2,6 @@ GOPROG(goarch
 	goarch:regress[386]
 	goos:regress[darwin]
 )
+
+GOTEST(goarch
+)

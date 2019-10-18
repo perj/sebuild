@@ -130,7 +130,7 @@ but you can also set them here. Conditions are further described
 A list of file names, relative paths.
 
 The files should contain global ninja variables. This can be used to set some
-ninja variables such as the default gopath. Passed to invars.sh to also
+ninja variables such as the default compiler flags. Passed to invars.sh to also
 generate variables there, must thus contain only variable assignments, no
 rules, as it has to be parsable by bash as well.
 
