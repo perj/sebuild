@@ -43,7 +43,7 @@ directory containing the Builddesc. If required, it will even be downloaded
 first, thus you can use any package available for download and install it
 to your local build.
 
-	gopkg[github.com/schibsted/sebuild/cmd/seb]
+	gopkg[github.com/schibsted/sebuild/v2/cmd/seb]
 
 The gopkg path used must name a `main` package.
 

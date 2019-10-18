@@ -11,7 +11,7 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/schibsted/sebuild/internal/pkg/assets"
+	"github.com/schibsted/sebuild/v2/internal/pkg/assets"
 )
 
 func Main(args ...string) {

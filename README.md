@@ -14,13 +14,9 @@ of go installed, we currently support Go 1.12 and higher.
 The master branch of this project always correspond to the latest release,
 it will correspond to a release tagged revision.
 
-In case you obtain only the binary and discard the source, you have to use
+You can also do this using go modules:
 
-	seb -install
-
-to install the required runtime files. By default the source downloaded by
-go get is however used. Seb will prompt you to do this if it can't find the
-files.
+	GO111MODULE=on go get github.com/schibsted/sebuild/v2/cmd/seb
 
 If you wish to change the code or contribute, see
 [CONTRIBUTING.md](CONTRIBUTING.md).

@@ -11,7 +11,7 @@ import (
 	"plugin"
 	"strings"
 
-	"github.com/schibsted/sebuild/pkg/buildbuild"
+	"github.com/schibsted/sebuild/v2/pkg/buildbuild"
 )
 
 // BuildPlugin compiles a sebuild plugin in the given directory.

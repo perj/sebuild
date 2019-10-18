@@ -23,7 +23,7 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/schibsted/sebuild/pkg/buildbuild"
+	"github.com/schibsted/sebuild/v2/pkg/buildbuild"
 )
 
 type Plugin struct {

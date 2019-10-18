@@ -15,10 +15,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/schibsted/sebuild/internal/pkg/assets"
+	"github.com/schibsted/sebuild/v2/internal/pkg/assets"
 )
-
-const modpath = "github.com/schibsted/sebuild"
 
 var mkpathCache = make(map[string]struct{})
 

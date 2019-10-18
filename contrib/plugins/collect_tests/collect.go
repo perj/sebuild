@@ -5,7 +5,7 @@ package collect_tests
 import (
 	"strings"
 
-	"github.com/schibsted/sebuild/pkg/buildbuild"
+	"github.com/schibsted/sebuild/v2/pkg/buildbuild"
 )
 
 type CollectTests struct {
