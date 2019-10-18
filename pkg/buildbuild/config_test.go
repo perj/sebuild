@@ -87,7 +87,7 @@ invars[c d]
 		BuildversionScript: "bv.sh",
 		Buildpath:          "buildpath",
 		ConfigScript:       "./config_script.sh",
-		GodepsRule:         "godeps",
+		GodepsRule:         "touch",
 		BuiltinInvars:      "bi_invars",
 		Invars:             []string{"c", "d", "a", "b"},
 	}

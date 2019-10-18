@@ -124,7 +124,7 @@ func (ops *GlobalOps) DefaultConfig() {
 		ops.Config.Buildpath = "build"
 	}
 	ops.Config.BuildversionScript = "git rev-list HEAD 2>/dev/null|wc -l|xargs"
-	ops.Config.GodepsRule = "godeps"
+	ops.Config.GodepsRule = "touch"
 
 	ops.Config.Conditions[runtime.GOOS] = true
 	if runtime.GOARCH == "amd64" {
