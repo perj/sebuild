@@ -1,5 +1,8 @@
-# Copyright 2018 Schibsted
+// Copyright 2018-2019 Schibsted
 
+package assets
+
+const DefaultsNinja = `
 # Default values for variables often overridden by flavor or compiler rule
 # files.
 cflags=-g -pipe -O2 -D_GNU_SOURCE -fvisibility=hidden -fstack-protector
@@ -9,3 +12,4 @@ cwarnflags=-Wall -Wshadow -Wwrite-strings -Wpointer-arith -Wcast-align -Wsign-co
 conlyflags=
 cxxflags=
 analyser_flags=--analyze -Xanalyzer -analyzer-output=html -Xanalyzer -analyzer-disable-checker -Xanalyzer deadcode.DeadStores
+`

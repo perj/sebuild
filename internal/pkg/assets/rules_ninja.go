@@ -1,5 +1,8 @@
-# Copyright 2018 Schibsted
+// Copyright 2018-2019 Schibsted
 
+package assets
+
+const RulesNinja = `
 rule cxx
     command = $cxx $picflag $flavor_cflags $cflags $cxxflags $cwarnflags $gcov_copts $copts $srcopts -I. -I$incdir $includes $defines -MMD -MF $out.d -MT $out -c $in -o $out
     depfile = $out.d
@@ -196,3 +199,4 @@ rule in
 rule inconfig
     command = seb -tool invars -buildvars="$buildvars" -invars="$builtin_invars" -out "$out" $in
     depfile = $out.d
+`
