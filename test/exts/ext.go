@@ -5,7 +5,7 @@ package main
 import (
 	"strings"
 
-	"github.com/schibsted/sebuild/pkg/buildbuild"
+	"github.com/schibsted/sebuild/v2/pkg/buildbuild"
 )
 
 type Ext struct {

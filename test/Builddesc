@@ -50,5 +50,5 @@ INSTALL(/regress/multitgt
 )
 
 GOPROG(test-remote
-	gopkg[github.com/schibsted/sebuild/cmd/seb]
+	gopkg[github.com/schibsted/sebuild/v2/cmd/seb]
 )
