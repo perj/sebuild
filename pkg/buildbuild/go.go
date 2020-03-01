@@ -124,8 +124,10 @@ func (g *GoTestDesc) Finalize(ops *GlobalOps) {
 	target = g.AddTarget("gocover/"+name+"-coverage", "gocover", []string{g.Srcdir}, "destroot", "", eas, opts)
 	AddGodeps(target, ops)
 
-	target = g.AddTarget("gocover/"+name+"-coverage.html", "gocover_html", []string{"gocover/" + name + "-coverage"}, "destroot", "", eas, nil)
+	target = g.AddTarget("gocover/"+name+".html", "gocover_html", []string{"gocover/" + name + "-coverage"}, "destroot", "", eas, nil)
 	target.CollectAs = "_gocover"
+
+	g.AddTarget("gocover/"+name+"-coverage.html", "gocover_html", []string{"gocover/" + name + "-coverage"}, "destroot", "", eas, nil)
 
 	if g.Benchflags != "" {
 		eas = append(eas, "benchflags="+g.Benchflags)

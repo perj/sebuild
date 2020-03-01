@@ -233,6 +233,7 @@ func (ops *GlobalOps) OutputFlavor(topdir, flavor string) {
 		fmt.Fprintf(w, " %s/%s", builddir, an.TargetName)
 	}
 	w.WriteByte('\n')
+	fmt.Fprintf(w, "build %s/gocover: phony %s\n", destdir, strings.Join(ops.CollectedVars["_gocover"], " "))
 
 	fmt.Fprintf(w, "build %s: phony %s\n", flavor, strings.Join(defaults, " "))
 
