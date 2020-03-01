@@ -17,7 +17,7 @@ To allow to run go test via ninja, for each GOTEST descriptor a target
 test. In addition, you can also run `go test -cover` to generate an html file
 with this target:
 
-    build/<flavor>/gocover/<name>-coverage.html
+    build/<flavor>/gocover/<name>.html
 
 And also `go test -bench` with
 
@@ -39,3 +39,9 @@ information about this.
 Unfortunately, the go coverage html generating does not currently work in other
 go modules than the main one. There is no easy way to solve this so it's kept
 as a known issue.
+
+To easily generate all go coverage report, the target
+
+    build/<flavor>/gocover
+
+maps to the list of reports and can be used to generate all of them.
