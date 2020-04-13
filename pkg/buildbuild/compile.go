@@ -121,6 +121,10 @@ func (l *LinkDesc) CompileSrc(srcdir, src, srcbase, ext string) {
 var findCompilerRun = (*exec.Cmd).Run
 
 func (ops *GlobalOps) FindCompilerCC() error {
+	if ops.didFindCompiler {
+		return nil
+	}
+	ops.didFindCompiler = true
 	candidates := ops.Config.Compiler
 	envcc := os.Getenv("CC")
 	if envcc != "" {

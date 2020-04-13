@@ -41,7 +41,7 @@ var (
 // Returns true if a `enabled` argument was found, regardless if it was saved
 // or not. Returning true and then not finding enabled in the arguments would
 // imply the descriptor should be skipped.
-func (args *Args) Parse(s *Scanner, conditions map[string]bool) (haveEnabled bool) {
+func (args *Args) Parse(s *Scanner, checkConditions func(string) bool) (haveEnabled bool) {
 	*args = Args{
 		make(map[string][]string),
 		make(map[string]map[string][]string),
@@ -103,10 +103,10 @@ func (args *Args) Parse(s *Scanner, conditions map[string]bool) (haveEnabled boo
 		}
 		s.scannerSpecials = builddescSpecials
 
-		if cond != "" && conditions == nil {
+		if cond != "" && checkConditions == nil {
 			panic(&ParseError{ConditionsNotAllowed, cond, s.Filename})
 		}
-		if cond != "" && !CheckConditions(cond, conditions) {
+		if cond != "" && !checkConditions(cond) {
 			continue
 		}
 
@@ -134,16 +134,30 @@ func (args *Args) Parse(s *Scanner, conditions map[string]bool) (haveEnabled boo
 	return
 }
 
-func CheckConditions(condstr string, conditions map[string]bool) bool {
+func (ops *GlobalOps) CheckConditions(condstr string) bool {
 	for _, cond := range strings.Split(condstr, ",") {
-		condval := true
-		if strings.HasPrefix(cond, "!") {
-			condval = false
-			cond = cond[1:]
-		}
-		if conditions[cond] != condval {
-			return false
+		condval, cond := parseCond(cond)
+		switch cond {
+		case "gcc", "clang":
+			if err := ops.FindCompilerCC(); err != nil {
+				panic(err)
+			}
+			val := ops.CompilerFlavor == cond
+			if val != condval {
+				return false
+			}
+		default:
+			if ops.Config.Conditions[cond] != condval {
+				return false
+			}
 		}
 	}
 	return true
+}
+
+func parseCond(cond string) (bool, string) {
+	if strings.HasPrefix(cond, "!") {
+		return false, cond[1:]
+	}
+	return true, cond
 }
