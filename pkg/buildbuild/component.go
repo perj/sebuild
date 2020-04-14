@@ -90,7 +90,7 @@ func (dp *DescParser) Parse(srcdir string, s *Scanner, flavors []string) ParseFu
 	tname := s.Text()
 
 	var args Args
-	haveEnabled := args.Parse(s, dp.Ops.Config.Conditions)
+	haveEnabled := args.Parse(s, dp.Ops.CheckConditions)
 
 	if flavors == nil {
 		flavors = dp.Ops.Config.ActiveFlavors
@@ -142,7 +142,7 @@ func (ops *GlobalOps) ParseDescriptorEnd(srcdir string, s *Scanner, flavors []st
 
 func (ops *GlobalOps) ParseComponent(srcdir string, s *Scanner, flavors []string) ParseFunc {
 	var args Args
-	args.Parse(s, ops.Config.Conditions)
+	args.Parse(s, ops.CheckConditions)
 	if args.Unflavored["flavors"] != nil {
 		flavors = args.Unflavored["flavors"]
 	}

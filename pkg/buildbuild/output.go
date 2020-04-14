@@ -75,6 +75,7 @@ func (ops *GlobalOps) OutputTop() (err error) {
 	for c := range ops.Config.Conditions {
 		conds = append(conds, c)
 	}
+	conds = append(conds, ops.CompilerFlavor)
 	sort.Strings(conds)
 	fmt.Fprintf(w, "# Conditions: %s\n", strings.Join(conds, ", "))
 
@@ -267,6 +268,7 @@ dest_lib=$destroot/lib
 	for c := range ops.Config.Conditions {
 		conds = append(conds, c)
 	}
+	conds = append(conds, ops.CompilerFlavor)
 	sort.Strings(conds)
 	for _, c := range conds {
 		fmt.Fprintf(&bvbuf, "%s=1\n", c)

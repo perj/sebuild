@@ -68,7 +68,16 @@ func testParseArgs(args *Args, s *Scanner, conds map[string]bool) (haveEnabled b
 			err = p.(error)
 		}
 	}()
-	return args.Parse(s, conds), nil
+	checkConds := func(condstr string) bool {
+		for _, c := range strings.Split(condstr, ",") {
+			condval, c := parseCond(c)
+			if conds[c] != condval {
+				return false
+			}
+		}
+		return true
+	}
+	return args.Parse(s, checkConds), nil
 }
 
 func TestArgs(t *testing.T) {

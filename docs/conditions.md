@@ -11,9 +11,9 @@ example could look like this:
 		includes[rand.h]
 	)
 
-Sources are only added if both conditions `linux` and `x86_64` are set.  Two
-conditions are always added: lowercase output of `uname` and output of `uname
--m`. For example `linux` and `x86_64`.
+Sources are only added if both conditions `linux` and `x86_64` are set. Three
+conditions are always added: lowercase output of `uname`, output of `uname
+-m` and the compiler flavor. For example `linux`, `x86_64` and `gcc`.
 
 Condition checks can be negated by prefixing them with a bang (`!`). Then
 the check is successful if the condition is NOT set.

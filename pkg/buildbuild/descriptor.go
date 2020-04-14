@@ -129,7 +129,7 @@ func (g *GeneralDesc) GenericParse(desc Descriptor, ops *GlobalOps, realsrcdir s
 			panic(err)
 		}
 		var incargs Args
-		incargs.Parse(s, ops.Config.Conditions)
+		incargs.Parse(s, ops.CheckConditions)
 		s.Close()
 		parentbd := g.Builddesc
 		g.Builddesc = inc

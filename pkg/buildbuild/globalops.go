@@ -52,6 +52,8 @@ type GlobalOps struct {
 	Config        Config
 	FlavorConfigs map[string]*FlavorConfig
 
+	didFindCompiler bool
+
 	// If non-nil, called after parsing CONFIG.
 	PostConfigFunc func(ops *GlobalOps) error
 
