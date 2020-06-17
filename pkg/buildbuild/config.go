@@ -96,6 +96,8 @@ type Config struct {
 	BuiltinDefaultsNinja string
 	BuiltinRulesNinja    string
 	BuiltinStaticNinja   string
+
+	GoTrackDeps string
 }
 
 type FlavorConfig struct {
@@ -235,6 +237,7 @@ func (ops *GlobalOps) ParseConfig(srcdir string, s *Scanner, flavors []string) P
 		{"builtin_defaults_ninja", &ops.Config.BuiltinDefaultsNinja},
 		{"builtin_rules_ninja", &ops.Config.BuiltinRulesNinja},
 		{"builtin_static_ninja", &ops.Config.BuiltinStaticNinja},
+		{"go_track_deps", &ops.Config.GoTrackDeps},
 	} {
 		if args.Unflavored[conf.key] != nil {
 			*conf.conf = strings.Join(args.Unflavored[conf.key], " ")

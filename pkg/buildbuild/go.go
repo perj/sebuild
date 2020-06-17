@@ -85,7 +85,8 @@ func (g *GoProgDesc) Finalize(ops *GlobalOps) {
 		// Buildmode plugin currently does not support cgo disabled.
 		eas = append(eas, "cgo_enabled=1")
 	}
-	target := g.AddTarget(tname, "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, g.TargetOptions)
+	tgopts := filterGoTargetOptions(g.TargetOptions, ops)
+	target := g.AddTarget(tname, "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, tgopts)
 	AddGodeps(target, ops)
 	g.GeneralDesc.Finalize(ops)
 }
@@ -112,7 +113,8 @@ func (g *GoTestDesc) Finalize(ops *GlobalOps) {
 	}
 
 	eas = append(eas, "gomode=test-prog")
-	target := g.AddTarget(name+".test", "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, g.TargetOptions)
+	tgopts := filterGoTargetOptions(g.TargetOptions, ops)
+	target := g.AddTarget(name+".test", "gobuild", []string{g.Srcdir}, g.Destdir, "", eas, tgopts)
 	eas = eas[:len(eas)-1]
 	AddGodeps(target, ops)
 
@@ -141,12 +143,23 @@ func (g *GoTestDesc) Finalize(ops *GlobalOps) {
 	g.GeneralDesc.Finalize(ops)
 }
 
+func filterGoTargetOptions(in map[string]bool, ops *GlobalOps) map[string]bool {
+	tgopts := make(map[string]bool, len(in))
+	for k, v := range in {
+		if k == "always-all" && ops.Config.GoTrackDeps != "" {
+			continue
+		}
+		tgopts[k] = v
+	}
+	return tgopts
+}
+
 var GoprogTemplate = GoProgDesc{
 	Mode: "prog",
 	LinkDesc: LinkDesc{
 		GeneralDesc: GeneralDesc{
 			Destdir:       "dest_bin",
-			TargetOptions: map[string]bool{"all": true, "incdeps": true, "libdeps": true},
+			TargetOptions: map[string]bool{"always-all": true, "all": true, "incdeps": true, "libdeps": true},
 		},
 	},
 }
@@ -156,7 +169,7 @@ var GomoduleTemplate = GoProgDesc{
 	LinkDesc: LinkDesc{
 		GeneralDesc: GeneralDesc{
 			Destdir:       "dest_mod",
-			TargetOptions: map[string]bool{"all": true, "incdeps": true, "libdeps": true},
+			TargetOptions: map[string]bool{"always-all": true, "all": true, "incdeps": true, "libdeps": true},
 		},
 	},
 }
@@ -165,7 +178,7 @@ var GotestTemplate = GoTestDesc{
 	LinkDesc: LinkDesc{
 		GeneralDesc: GeneralDesc{
 			Destdir:       "gotest",
-			TargetOptions: map[string]bool{"all": true, "incdeps": true, "libdeps": true},
+			TargetOptions: map[string]bool{"always-all": true, "all": true, "incdeps": true, "libdeps": true},
 		},
 	},
 }

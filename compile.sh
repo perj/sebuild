@@ -13,7 +13,7 @@ elif ! command -v seb > /dev/null; then
 	export PATH="$HOME/go/bin:$PATH"
 fi
 
-seb
+seb "$@"
 [ -z "$RUNTESTS" ] && exit 0
 
 ninja -f "$BUILDPATH"/build.ninja "$BUILDPATH"/dev/gotest/buildbuild

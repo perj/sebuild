@@ -18,3 +18,7 @@ arguments. Special conditions and ninja variables are described on that
 page as well. Since Go doesn't support compiling these modules without
 cgo the `nocgo` argument is not available. Other settings disabling cgo
 are also ignored.
+
+By default, dependency tracking is disabled for Go modules, since it can be
+quite slow. See the [go_track_deps](gonfig.md#go_track_deps) CONFIG argument
+for more details.

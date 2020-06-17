@@ -62,6 +62,8 @@ func Main(args ...string) {
 		flagset.Usage()
 		os.Exit(2)
 	}
+	skipDepfile := strings.HasSuffix(outpath, ".phony")
+	outpath = strings.TrimSuffix(outpath, ".phony")
 	if depfile == "" && needDepfile(*mode) {
 		flagset.Usage()
 		os.Exit(2)
@@ -79,7 +81,7 @@ func Main(args ...string) {
 		fmt.Printf("gobuild: Entering directory `%s'\n", absin)
 	}
 
-	if depfile != "" {
+	if !skipDepfile && depfile != "" {
 		depf, err := os.OpenFile(absdep, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)

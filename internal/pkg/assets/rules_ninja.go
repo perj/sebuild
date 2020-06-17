@@ -122,6 +122,8 @@ pool gobuilds_piclib
 # variables if not set there however.  This is for dependencies to work more
 # properly as configvars script changes retrigger builds but environment
 # variables do not.
+# Note that for gobuild the depfile is only used if enabled. By default
+# the commands are always run and instead use the Go build cache.
 gobuild_tool=GOBUILD_FLAGS=$gobuild_flags GOBUILD_TEST_FLAGS=$gobuild_test_flags CGO_ENABLED=$cgo_enabled seb -tool gobuild
 
 rule gobuild

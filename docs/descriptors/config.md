@@ -205,6 +205,18 @@ is enough to rebuild all Go targets when go.mod changes.
 
 Empty list by default.
 
+## go_track_deps
+If set to non-empty, enables tracking of Go depencies just like other
+languages. Unfortunately, using `go list` to find the dependencies is sometimes
+slower than the actual compilation. Especially since Go has a built-in build
+cache that makes it quick to recompile unchanged programs. Thus the dependency
+tracking is disabled by default for Go programs, they're instead compiled every
+time sebuild invokes ninja, but usually cached.
+
+Enable this if you find it faster or if you need to have proper dependency
+tracking. Without this flag set, ninja will never report "nothing to do" if
+there are go targets present, since they're always re-run.
+
 ## extensions
 A list of plugins to load. Plugins are go modules that can customize the
 desciptors and other parts of sebuild. See the
