@@ -322,7 +322,12 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 		orderDeps := desc.ResolveOrderDeps(target)
 		srcs := desc.ResolveSrcs(ops, tname, target.Sources...)
 
-		fmt.Fprintf(w, "build %s: %s ", dest, rule)
+		if target.Options["always-all"] {
+			fmt.Fprintf(w, "build %s: phony %s.phony\n", dest, dest)
+			fmt.Fprintf(w, "build %s.phony: %s ", dest, rule)
+		} else {
+			fmt.Fprintf(w, "build %s: %s ", dest, rule)
+		}
 		fmt.Fprint(w, strings.Join(srcs, " "))
 
 		if len(deps) > 0 {
@@ -344,7 +349,10 @@ func (ops *GlobalOps) OutputDescriptor(desc Descriptor, builddir, objdir string)
 		if len(target.Srcopts) > 0 {
 			fmt.Fprint(w, "    srcopts=", strings.Join(target.Srcopts, " "), "\n")
 		}
-		if target.Options["all"] {
+		if target.Options["always-all"] {
+			fmt.Fprintf(w, "default %s.phony\n", dest)
+			defaults = append(defaults, dest+".phony")
+		} else if target.Options["all"] {
 			fmt.Fprintf(w, "default %s\n", dest)
 			defaults = append(defaults, dest)
 		}

@@ -45,3 +45,7 @@ To easily generate all go coverage report, the target
     build/<flavor>/gocover
 
 maps to the list of reports and can be used to generate all of them.
+
+By default, dependency tracking is disabled for Go tests, since it can be
+quite slow. See the [go_track_deps](gonfig.md#go_track_deps) CONFIG argument
+for more details.
