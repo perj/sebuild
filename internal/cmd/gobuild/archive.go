@@ -21,9 +21,9 @@ func buildCArchive(mode string, ldflags []string) {
 
 	if mode == "piclib" {
 		// -a to build standard libs with -shared
-		executeWithLdFlagsAndPkg(ldflags, "go", "build", "-i", "-pkgdir", abspkgdir+"/gopkg_piclib", "-installsuffix=piclib", "-buildmode=c-archive", "-gcflags=-shared", "-asmflags=-shared", "-a", "-o", absout)
+		executeWithLdFlagsAndPkg(ldflags, "go", "build", "-pkgdir", abspkgdir+"/gopkg_piclib", "-installsuffix=piclib", "-buildmode=c-archive", "-gcflags=-shared", "-asmflags=-shared", "-a", "-o", absout)
 	} else {
-		executeWithLdFlagsAndPkg(ldflags, "go", "build", "-i", "-pkgdir", abspkgdir+"/gopkg_lib", "-installsuffix=lib", "-buildmode=c-archive", "-o", absout)
+		executeWithLdFlagsAndPkg(ldflags, "go", "build", "-pkgdir", abspkgdir+"/gopkg_lib", "-installsuffix=lib", "-buildmode=c-archive", "-o", absout)
 	}
 
 	// If there weren't any exports the header won't be created, but we expect it to be there.
