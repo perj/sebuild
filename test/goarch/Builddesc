@@ -1,6 +1,6 @@
 GOPROG(goarch
 	goarch:regress[386]
-	goos:regress[darwin]
+	goos:regress[openbsd]
 )
 
 GOTEST(goarch
